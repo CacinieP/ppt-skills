@@ -1,8 +1,18 @@
 # PPT Skills
 
+[![License](https://img.shields.io/github/license/CacinieP/ppt-skills?style=flat-square)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-1%20released-39c5bb?style=flat-square)](skills/)
+
 Open-source collection of PPT generation skills — themed, CJK-aware, editable PPTX via PptxGenJS.
 
 Each skill is a self-contained recipe for building presentation decks with consistent design, correct CJK rendering, and brand-level visual polish.
+
+## What Makes These Skills Different
+
+- **Editable output**: decks are generated as `.pptx`, not flat images
+- **CJK-aware layout**: Chinese text, font fallback, and line breaking are first-class constraints
+- **Theme recipes**: each skill defines palette, typography, layout, and QA steps
+- **Production checklists**: skills include render verification instead of only code snippets
 
 ## Skills
 
