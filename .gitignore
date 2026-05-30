@@ -3,12 +3,11 @@
 .env.local
 .env.*.local
 
-# StepFun generated images
+# AI generated images (StepFun / MiniMax)
 assets/
 
 # Node
 node_modules/
-package.json
 package-lock.json
 
 # Build scripts & output (local artifacts, not skill code)

@@ -1,0 +1,29 @@
+{
+  "name": "ppt-skills",
+  "version": "1.1.0",
+  "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows and AI image helpers.",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CacinieP/ppt-skills.git"
+  },
+  "keywords": [
+    "pptx",
+    "pptxgenjs",
+    "cjk",
+    "presentation",
+    "stepfun",
+    "minimax",
+    "ai-image"
+  ],
+  "scripts": {
+    "color:qa": "node scripts/color-qa.mjs",
+    "smoke": "node scripts/smoke-test.mjs",
+    "test": "node scripts/smoke-test.mjs"
+  },
+  "bugs": {
+    "url": "https://github.com/CacinieP/ppt-skills/issues"
+  },
+  "homepage": "https://github.com/CacinieP/ppt-skills#readme",
+  "license": "MIT"
+}

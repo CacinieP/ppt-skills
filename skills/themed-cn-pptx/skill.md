@@ -1,6 +1,6 @@
 ---
 name: themed-cn-pptx
-description: Build or modify Chinese + IP/character-themed + QR-embeddable editable PPTX decks using PptxGenJS, with StepFun AI image generation
+description: Build or modify Chinese + IP/character-themed + QR-embeddable editable PPTX decks using PptxGenJS, with StepFun or MiniMax AI image generation
 ---
 
 <aside>
@@ -12,7 +12,7 @@ description: Build or modify Chinese + IP/character-themed + QR-embeddable edita
 
 **依赖技能**：标准 `pptx` skill（本 skill 是它的增量补充）
 
-**生图能力**：集成 StepFun 阶跃星辰文生图 API，API Key 从环境变量读取，不硬编码
+**生图能力**：集成 StepFun 阶跃星辰和 MiniMax 文生图 API，API Key 从环境变量读取，不硬编码
 
 </aside>
 
@@ -102,69 +102,189 @@ const C = { miku:"39C5BB", mikuDeep:"1FA89E", pink:"FF77AA", pinkSoft:"FFC2DB",
 
 ---
 
-## 2.5 AI 生图 — 尺寸适配（StepFun）
+## 2.1 色彩方案与 QA 规则
 
-通过 StepFun 阶跃星辰 API 生成配图，自动适配 PPT 排版。**不硬编码 API Key**，从环境变量 `STEPFUN_API_KEY` 读取。
+中文 PPT 的色彩 QA 不看“感觉”，先按 sRGB / RGB 色号计算。RGB 通道不是线性亮度；先把 `#RRGGBB` 的 R/G/B 从 0-255 归一化并做 sRGB gamma 线性化，再算相对亮度：
+
+```text
+L = 0.2126 * R_linear + 0.7152 * G_linear + 0.0722 * B_linear
+contrast = (L_lighter + 0.05) / (L_darker + 0.05)
+```
+
+绿色通道对亮度贡献最大，蓝色最小，所以**不要用 RGB 数值差或“看起来颜色不一样”判断可读性**。正文对比度至少 4.5:1；大标题、粗体大字、UI 边框、图形对象至少 3:1。用 `scripts/color-qa.mjs` 快速检查：
+
+```bash
+node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body
+node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
+```
+
+### 色彩方案选择
+
+| 方案 | 适用 | 规则 |
+| --- | --- | --- |
+| Neutral + Accent | 中文说明型、产品介绍、交付物 | 最稳。正文只用深墨色/近白，品牌色只做条纹、编号、图标、强调块 |
+| Monochrome 单色系 | 严肃、科技、统一感强的 deck | 必须拉开明度阶，不要只改饱和度；正文仍用深/浅中性色 |
+| Analogous 邻近色 | 柔和、情绪统一的角色主题 | 需要一个深底和一个浅底承载文字，否则容易“一片糊” |
+| Complementary 互补色 | 封面、章节页、强冲突观点 | 一方做主色，另一方只做 5-10% 强调；不要互相做正文/背景 |
+| Split-complementary 分裂互补 | IP 主题、活泼但可控 | 比纯互补更安全，适合“主色 + 两个小强调色” |
+| Triadic / Tetradic | 流程图、矩阵、分类图 | 只用于图形编码；同页高饱和主色不超过 3 个 |
+| Dark mode 深底 | 封面、收尾、章节分隔 | 用 `textOnDark` 近白，不用纯高饱和色写长正文；图片上文字必须加遮罩 |
+
+### 颜色组合负面清单
+
+这些组合默认判为风险，除非能证明对比度和场景都安全：
+
+1. **正文对比度 < 4.5:1**：任何小字号中文、脚注、URL、表格正文都禁止。
+2. **标题 / 图形 / UI 对比度 < 3:1**：大标题、标签、边框、图标、数据图例都禁止。
+3. **副色当正文**：例如高饱和粉、青、黄直接写在浅底上，通常会失败；副色只做 kicker、短线、编号、callout。
+4. **红 + 绿表达状态**：不要只靠红绿区分成功/失败；必须加文字、图标或形状。
+5. **蓝字压红/橙底，或红/橙字压蓝底**：CJK 小字边缘容易震动，除非是大号短标题且对比度足够。
+6. **两个高饱和色互为文字/背景**：如亮青压亮粉、亮黄压亮蓝；用中性色隔开。
+7. **同色相低明度差**：同一 hue 只改一点点亮度/饱和度，容易看成一片；相邻层级必须拉开亮度。
+8. **浅灰压浅底 / 深灰压深底**：灰度很容易“过关感知不过关”，用脚本先算。
+9. **AI 图上裸放文字**：不允许直接在复杂图片上放正文；加 40-55% 深色遮罩或独立文字底板。
+10. **一页超过 3 个高饱和主视觉色**：分类图例可以多色，普通内容页不行。
+11. **全 deck 只有一个 hue 家族且没有中性深浅阶**：会变成单色糊；至少保留深底、浅底、正文色、弱化文字色。
+12. **PptxGenJS 色号带 `#`**：代码里始终写 `"39C5BB"`，不要写 `"#39C5BB"`。
+
+QA 时列出实际使用的 `fg/bg` 对，至少检查：正文 on 浅底、正文 on 深底、标题 on 封面图遮罩、表格文字 on header、QR URL、footer、图例文字。
+
+---
+
+## 2.5 AI 生图 — 尺寸适配（StepFun / MiniMax）
+
+通过 `lib/ai-image.js` 生成配图，自动适配 PPT 排版。**StepFun 是默认和重点推荐 provider**；MiniMax 作为可选补充。两者都支持国内版 / 国际版。**不硬编码 API Key**，从环境变量或 `.env` 读取。新脚本优先导入 `ai-image.js`；旧脚本继续导入 `stepfun-image.js` 也能运行（兼容 re-export）。
 
 ### 引入方式
 
 ```jsx
-import { generateSlideImage, addImageToSlide, addImageOverlay, SIZE_MAP } from "./lib/stepfun-image.js";
+import { generateSlideImage, addImageToSlide, addImageOverlay, SIZE_MAP } from "./lib/ai-image.js";
 
-// 用法：按用途自动选尺寸
-const img = await generateSlideImage({ prompt: "赛博朋克城市夜景", usage: "cover" });
+// 用法：按用途自动选比例/尺寸
+const img = await generateSlideImage({
+  provider: "stepfun-cn", // 推荐；也支持 stepfun-global / minimax-cn / minimax-global
+  prompt: "赛博朋克城市夜景，中文发布会封面背景，留出标题区域",
+  usage: "cover",
+});
+
 if (img) {
   slide.addImage({ path: img.localPath, x: 0, y: 0, w: img.pptxLayout.w, h: img.pptxLayout.h });
 }
 ```
 
+### Provider 选择
+
+优先级：
+
+1. `generateSlideImage({ provider: "stepfun" | "minimax" })`
+2. 环境变量 `PPT_IMAGE_PROVIDER` 或 `AI_IMAGE_PROVIDER`
+3. 如果只有 `MINIMAX_API_KEY`，自动选择 `minimax`
+4. 默认 `stepfun-cn`，保证旧脚本行为不变，并优先走 StepFun 国内开放平台
+
+可直接使用 region alias：
+
+```jsx
+await generateSlideImage({ provider: "stepfun-cn", prompt, usage: "cover" });
+await generateSlideImage({ provider: "stepfun-global", prompt, usage: "cover" });
+await generateSlideImage({ provider: "minimax-cn", prompt, usage: "card" });
+await generateSlideImage({ provider: "minimax-global", prompt, usage: "card" });
+```
+
 ### 用途 → 尺寸映射
 
-**全幅背景**（16:9 精确匹配 10″×5.625″）：
-
-| **用途** | **图片尺寸** | **比例** | **推荐模型** | **PPTX (英寸)** | **说明** |
-| --- | --- | --- | --- | --- | --- |
-| `cover` | 1360×768 | 16:9 | step-image-edit-2 | `{ w:10, h:5.625 }` | 封面全幅背景，比例与幻灯片完全匹配 |
-| `coverOverlay` | 1360×768 | 16:9 | step-image-edit-2 | `{ w:10, h:5.625 }` | 同上，但明确需要遮罩+文字层 |
-
-**横幅 & 侧栏**：
-
-| **用途** | **图片尺寸** | **比例** | **PPTX (英寸)** | **说明** |
+| **用途** | **PPT 场景** | **StepFun 尺寸** | **MiniMax 比例** | **PPTX (英寸)** |
 | --- | --- | --- | --- | --- |
-| `hero` | 1360×768 | 16:9 | `{ w:10, h:3 }` | 上半区横幅，裁切为 ~3″ 高 |
-| `sideStrip` | 768×1360 | 9:16 | `{ w:2.5, h:4.44 }` | 右侧竖版装饰条 |
+| `cover` | 封面全幅背景 | 1360×768 | 16:9 | `{ w:10, h:5.625 }` |
+| `coverOverlay` | 带文字遮罩的封面背景 | 1360×768 | 16:9 | `{ w:10, h:5.625 }` |
+| `hero` | 上半区横幅 | 1360×768 | 16:9 | `{ w:10, h:3 }` |
+| `sideStrip` | 右侧竖版装饰条 | 768×1360 | 9:16 | `{ w:2.5, h:4.44 }` |
+| `card` | 方形卡片配图 | 1024×1024 | 1:1 | `{ w:2.5, h:2.5 }` |
+| `cardTall` | 竖版卡片配图 | 896×1184 | 3:4 | `{ w:2.3, h:3.04 }` |
+| `cardWide` | 横版卡片配图 | 1184×896 | 4:3 | `{ w:3.5, h:2.65 }` |
+| `showcase` | 产品/项目展示 | 1184×896 | 4:3 | `{ w:3.9, h:2.95 }` |
+| `phoneMockup` | 手机竖屏 mockup | 768×1360 | 9:16 | `{ w:1.8, h:3.2 }` |
+| `icon` | 小图标/占位图 | 512×512 | 1:1 | `{ w:1.5, h:1.5 }` |
 
-**卡片 & 内嵌图**：
+适配规则：
 
-| **用途** | **图片尺寸** | **比例** | **PPTX (英寸)** | **说明** |
-| --- | --- | --- | --- | --- |
-| `card` | 1024×1024 | 1:1 | `{ w:2.5, h:2.5 }` | 方形配图，最通用 |
-| `cardTall` | 896×1184 | 3:4 | `{ w:2.3, h:3.04 }` | 竖版配图 |
-| `cardWide` | 1184×896 | 4:3 | `{ w:3.5, h:2.65 }` | 横版配图 |
-| `showcase` | 1184×896 | 4:3 | `{ w:3.9, h:2.95 }` | 项目展示，更宽 |
-| `phoneMockup` | 768×1360 | 9:16 | `{ w:1.8, h:3.2 }` | 手机竖屏 mockup |
-
-**小尺寸**：
-
-| **用途** | **图片尺寸** | **比例** | **推荐模型** | **PPTX (英寸)** | **说明** |
-| --- | --- | --- | --- | --- | --- |
-| `icon` | 512×512 | 1:1 | step-2x-large | `{ w:1.5, h:1.5 }` | 小图标/占位图 |
+- StepFun `step-image-edit-2` 使用官方 `size` 字符串：`1024x1024`、`768x1360`、`896x1184`、`1360x768`、`1184x896`。文档标注该字符串是 `height x width`，但在本 skill 中按**视觉用途**映射到 PPT：`cover/hero` 固定用 `1360x768`，`showcase/cardWide` 固定用 `1184x896`，`phoneMockup/sideStrip` 固定用 `768x1360`。
+- StepFun 当前单次文生图按 1 张处理；如需要多张候选图，循环调用，不依赖 `n > 1`。
+- MiniMax 优先使用 `aspect_ratio` 而不是 `width/height`：`16:9`、`4:3`、`1:1`、`3:4`、`9:16`。只有确实需要自定义像素时才传 `width/height`，并保证 512-2048 且能被 8 整除。
+- `cover`、`hero`、`showcase`、`phoneMockup` 不手写尺寸，统一从 `SIZE_MAP` 或 `getImageUsageConfig()` 取，避免把 MiniMax ratio 和 StepFun size 混用。
+- 返回 URL 一律立即下载到 `assets/<provider>/`，PPTX 只引用本地文件，避免 StepFun/MiniMax 临时链接过期。
 
 ### 环境变量配置
 
 ```bash
-# 必填：StepFun API Key（https://platform.stepfun.com 获取）
-export STEPFUN_API_KEY=sk-xxx
+# 可选：默认生图供应商
+export PPT_IMAGE_PROVIDER=stepfun   # stepfun | minimax
+export PPT_IMAGE_REGION=cn          # cn | global
 
-# 可选：API 地址（默认 https://api.stepfun.com/v1）
-export STEPFUN_BASE_URL=https://api.stepfun.com/v1
+# StepFun（国内 https://platform.stepfun.com；国际 https://platform.stepfun.ai）
+export STEPFUN_API_KEY=sk-xxx
+export STEPFUN_REGION=cn            # cn -> api.stepfun.com；global -> api.stepfun.ai
+export STEPFUN_API_MODE=platform    # platform | step_plan
+# export STEPFUN_BASE_URL=https://api.stepfun.com/v1  # 可选强制覆盖
+
+# MiniMax（国内 https://platform.minimaxi.com；国际 https://platform.minimax.io）
+export MINIMAX_API_KEY=sk-xxx
+export MINIMAX_REGION=global        # cn -> api.minimaxi.com；global -> api.minimax.io
+# export MINIMAX_BASE_URL=https://api.minimax.io/v1   # 可选强制覆盖
 ```
 
-**Claude Code 用户**可通过 MCP 一并配置：
+`ai-image.js` 会自动加载项目根目录 `.env`，但 shell / MCP / CI 中已有的 `process.env` 优先。
+
+### Provider 参数
+
+- StepFun：使用 `/images/generations`，按具体 `size` 生成，适合精确 PPT 预设。
+- MiniMax：使用 `/image_generation`，按 `aspect_ratio` 生成；返回 URL 时工具会立即下载到本地，避免 URL 过期影响 PPT。
+- StepFun 国内开放平台默认 Base URL：`https://api.stepfun.com/v1`
+- StepFun 国际开放平台默认 Base URL：`https://api.stepfun.ai/v1`
+- StepFun Step Plan 国内 / 国际专属路径：`https://api.stepfun.com/step_plan/v1` / `https://api.stepfun.ai/step_plan/v1`
+- MiniMax 国内 / 国际默认 Base URL：`https://api.minimaxi.com/v1` / `https://api.minimax.io/v1`
+- MiniMax 可传 `promptOptimizer`、`seed`、`n`、`subjectReference`：
+
+```jsx
+const img = await generateSlideImage({
+  provider: "minimax",
+  prompt,
+  usage: "showcase",
+  promptOptimizer: true,
+  seed: 42,
+});
+```
+
+StepFun 可传 `steps`、`cfgScale`、`negativePrompt`、`textMode`、`seed`、`apiMode`：
+
+```jsx
+const img = await generateSlideImage({
+  provider: "stepfun-cn",
+  prompt,
+  usage: "cover",
+  steps: 8,
+  cfgScale: 1.0,
+  textMode: true,
+});
+```
+
+### 开放平台申请与使用指南（StepFun 推荐）
+
+1. 选择版本：国内账号用 `https://platform.stepfun.com`，国际账号用 `https://platform.stepfun.ai`。
+2. 注册 / 登录后进入用户中心或 API Key 页面。
+3. 创建 API Key。只放在本地 `.env`、系统环境变量或 CI Secret，不写进源码。
+4. 普通开放平台调用用 `STEPFUN_API_MODE=platform`；如已订阅 Step Plan 且要走专属路径，用 `STEPFUN_API_MODE=step_plan`。
+5. 在构建目录创建 `.env`：
 
 ```bash
-claude mcp add stepfun -s user -e STEPFUN_API_KEY=sk-xxx -- npx -y @stepfun/mcp-server
+PPT_IMAGE_PROVIDER=stepfun
+PPT_IMAGE_REGION=cn
+STEPFUN_API_KEY=sk-xxx
+STEPFUN_REGION=cn
+STEPFUN_API_MODE=platform
 ```
+
+6. 先跑 `npm test` 验证导入、provider/region 解析、无 key 降级。
+7. 构建 PPT 时优先使用 `provider: "stepfun-cn"`；国际版账号改为 `provider: "stepfun-global"` 或设置 `STEPFUN_REGION=global`。
 
 ### 图片排版规范
 
@@ -176,11 +296,12 @@ claude mcp add stepfun -s user -e STEPFUN_API_KEY=sk-xxx -- npx -y @stepfun/mcp-
 
 ### 模型尺寸对照
 
-| 模型 | 支持尺寸 |
-| --- | --- |
-| `step-image-edit-2`（默认） | 1024×1024, 768×1360, 896×1184, 1360×768, 1184×896 |
-| `step-2x-large` | 1024×1024, 1280×800, 800×1280, 512×512 |
-| `step-1x-medium` | 1024×1024, 1280×800, 800×1280, 512×512 |
+| Provider | 模型 | 支持尺寸 / 比例 |
+| --- | --- | --- |
+| StepFun | `step-image-edit-2`（默认） | 1024×1024, 768×1360, 896×1184, 1360×768, 1184×896 |
+| StepFun | `step-2x-large` | 256×256, 512×512, 768×768, 1024×1024, 1280×800, 800×1280 |
+| StepFun | `step-1x-medium` | 256×256, 512×512, 768×768, 1024×1024, 1280×800, 800×1280 |
+| MiniMax | `image-01` | 1:1, 16:9, 4:3, 3:2, 2:3, 3:4, 9:16, 21:9 |
 
 ---
 
@@ -405,6 +526,9 @@ pdftoppm -jpeg -r 100 deck.pdf slide
 - [ ]  章节下划线对齐到（可能换行的）标题了吗？
 - [ ]  卡内正文溢出底边了吗？
 - [ ]  主色 on 浅主色、副色 on 副色——文字看不见？
+- [ ]  `scripts/color-qa.mjs` 检查过正文/标题/图形的所有前景-背景组合？
+- [ ]  正文对比度 ≥ 4.5:1，大标题/图形/边框 ≥ 3:1？
+- [ ]  是否出现红绿状态只靠颜色区分、双高饱和文字/背景、浅灰压浅底？
 - [ ]  页脚压内容了吗？
 - [ ]  CJK 渲染成豆腐块了吗？
 - [ ]  AI 配图比例是否与 PPT 布局匹配？
@@ -427,7 +551,8 @@ pdftoppm -jpeg -r 100 -f N -l N deck.pdf slide-fix
 skills/themed-cn-pptx/
   skill.md                     # 本文档
   lib/
-    stepfun-image.js           # StepFun 生图工具库
+    ai-image.js                # StepFun / MiniMax 通用生图工具库
+    stepfun-image.js           # 旧脚本兼容入口，re-export ai-image.js
   examples/
     build_<theme>.js           # 可选：示例构建脚本
 ```
@@ -438,9 +563,12 @@ skills/themed-cn-pptx/
 /data/
   build_<theme>.js             # PptxGenJS 脚本
   lib/
-    stepfun-image.js           # 生图工具库副本
+    ai-image.js                # 生图工具库副本
+    stepfun-image.js           # 兼容旧脚本时才需要
   assets/
-    stepfun/                   # AI 生成的图片
+    stepfun/                   # StepFun 生成的图片
+      YYYY-MM-DD-xxxx.png
+    minimax/                   # MiniMax 生成的图片
       YYYY-MM-DD-xxxx.png
   qr.png                       # 收尾页二维码
   <output>.pptx                # 最终交付
@@ -468,10 +596,11 @@ skills/themed-cn-pptx/
 ### AI 生图
 
 - [ ]  背景图用 1360×768（16:9）匹配幻灯片，不裁切不留白
-- [ ]  卡片配图比例与 PPT 布局一致（1:1 → card, 4:3 → cardWide, 3:4 → cardTall）
+- [ ]  MiniMax 背景图用 `16:9`，StepFun 背景图用 1360×768，均匹配幻灯片
+- [ ]  卡片配图比例与 PPT 布局一致（1:1 → card, 4:3 → cardWide/showcase, 3:4 → cardTall）
 - [ ]  背景图上有文字时，叠加半透明遮罩确保可读
 - [ ]  卡片内图片与文字间距 ≥ 0.15″，不贴死
-- [ ]  `STEPFUN_API_KEY` 未设置时不报错，优雅降级为纯色/占位
+- [ ]  所选 provider 的 API key 未设置时不报错，优雅降级为纯色/占位
 
 ### 改 PPT 路径额外检查
 
