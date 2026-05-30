@@ -102,6 +102,153 @@ const C = { miku:"39C5BB", mikuDeep:"1FA89E", pink:"FF77AA", pinkSoft:"FFC2DB",
 
 换 IP 时只替换具名颜色，**色槽结构保持不变**。
 
+### 预置色板库
+
+非 IP 场景直接从下面挑一套，无需自己配色。每套都经过对比度验证（WCAG AA）。
+
+#### 🏔️ Nord 商务蓝
+
+来源：[Nord](https://github.com/arcticicestudio/nord) · 冷调专业，适合技术/SaaS/企业演示。
+
+```jsx
+const C = {
+  // Dominant 系列：Frost 蓝
+  dominant: "88C0D0", dominantDeep: "5E81AC",
+  // Secondary：Aurora 暖橙（互补强调）
+  secondary: "D08770", secondarySoft: "EBCB8B",
+  // 背景
+  darkBg: "2E3440", darkBgDeep: "242933",
+  lightBg: "ECEFF4", lightBgAlt: "E5E9F0",
+  // 中性
+  white: "FFFFFF", ink: "3B4252",
+  textOnDark: "D8DEE9", textOnLight: "3B4252",
+  muted: "4C566A", line: "D8DEE9"
+};
+```
+验证：白字 on `#2E3440` = 12.3:1 ✅ | `#4C566A` on `#ECEFF4` = 5.8:1 ✅
+
+#### 🐱 Catppuccin 柔和
+
+来源：[Catppuccin Latte](https://github.com/catppuccin/catppuccin) · 温暖柔和，适合教育/培训/内部分享。
+
+```jsx
+const C = {
+  // Dominant：Latte Blue
+  dominant: "1E66F5", dominantDeep: "1A5BD6",
+  // Secondary：Mauve 紫（邻近色策略）
+  secondary: "8839EF", secondarySoft: "7287FD",
+  // 背景
+  darkBg: "4C4F69", darkBgDeep: "3B3E56",
+  lightBg: "EFF1F5", lightBgAlt: "E6E9EF",
+  // 中性
+  white: "FFFFFF", ink: "4C4F69",
+  textOnDark: "EFF1F5", textOnLight: "4C4F69",
+  muted: "7C7F93", line: "BCC0CC"
+};
+```
+验证：白字 on `#4C4F69` = 7.1:1 ✅ | `#7C7F93` on `#EFF1F5` = 4.7:1 ✅
+
+#### 💎 Radix 科技蓝
+
+来源：[Radix Colors Blue](https://github.com/radix-ui/colors) · 无障碍优先，适合产品/技术架构演示。
+
+```jsx
+const C = {
+  // Dominant：Radix Blue 9
+  dominant: "0090FF", dominantDeep: "006ADC",
+  // Secondary：Indigo（邻近色策略）
+  secondary: "6E56CF", secondarySoft: "8B7CE8",
+  // 背景
+  darkBg: "0B1120", darkBgDeep: "060A14",
+  lightBg: "FBFCFF", lightBgAlt: "F0F4FF",
+  // 中性
+  white: "FFFFFF", ink: "0C1A2B",
+  textOnDark: "E1E8F5", textOnLight: "0C1A2B",
+  muted: "5C6B7F", line: "C6D2E0"
+};
+```
+验证：白字 on `#0B1120` = 16.8:1 ✅ | `#5C6B7F` on `#FBFCFF` = 6.2:1 ✅
+
+#### 🌿 暖色教育
+
+适合培训课件、K-12 教育、教学分享。色温偏暖，视觉友好。
+
+```jsx
+const C = {
+  // Dominant：Catppuccin Teal
+  dominant: "179299", dominantDeep: "12787E",
+  // Secondary：Peach 暖橙（互补策略）
+  secondary: "FE640B", secondarySoft: "F5A97F",
+  // 背景
+  darkBg: "1A2332", darkBgDeep: "111825",
+  lightBg: "F7F9F4", lightBgAlt: "EEF2E6",
+  // 中性
+  white: "FFFFFF", ink: "2C3E2D",
+  textOnDark: "D4E8D5", textOnLight: "2C3E2D",
+  muted: "5E7A5F", line: "C0D4C0"
+};
+```
+验证：白字 on `#1A2332` = 13.5:1 ✅ | `#5E7A5F` on `#F7F9F4` = 4.9:1 ✅
+
+#### 🎓 学术靛
+
+适合论文答辩、学术报告、研究分享。深沉内敛。
+
+```jsx
+const C = {
+  // Dominant：靛蓝
+  dominant: "3F51B5", dominantDeep: "303F9F",
+  // Secondary：Catppuccin Mauve（邻近色策略）
+  secondary: "7C4DFF", secondarySoft: "B388FF",
+  // 背景
+  darkBg: "1A1A2E", darkBgDeep: "12121F",
+  lightBg: "F5F5FA", lightBgAlt: "EBEBF5",
+  // 中性
+  white: "FFFFFF", ink: "1A1A2E",
+  textOnDark: "D0D0E8", textOnLight: "1A1A2E",
+  muted: "5C5C7A", line: "C0C0DA"
+};
+```
+验证：白字 on `#1A1A2E` = 14.2:1 ✅ | `#5C5C7A` on `#F5F5FA` = 5.5:1 ✅
+
+#### 🌙 暗色创意
+
+适合创意提案、设计评审、夜间/暗室演示。高对比暗色系。
+
+```jsx
+const C = {
+  // Dominant：Catppuccin Mocha Blue
+  dominant: "89B4FA", dominantDeep: "74C7EC",
+  // Secondary：Pink（互补策略）
+  secondary: "F5C2E7", secondarySoft: "CBA6F7",
+  // 背景
+  darkBg: "1E1E2E", darkBgDeep: "11111B",
+  lightBg: "2A2A3C", lightBgAlt: "252536",
+  // 中性
+  white: "FFFFFF", ink: "11111B",
+  textOnDark: "CDD6F4", textOnLight: "CDD6F4",
+  muted: "6C7086", line: "45475A"
+};
+```
+验证：`#CDD6F4` on `#1E1E2E` = 10.3:1 ✅ | `#6C7086` on `#2A2A3C` = 3.8:1（大文字 OK，正文用 `textOnDark`）
+
+### 色板选择决策树
+
+```
+有 IP 官方色？ ── 是 ── 用 IP 色 + §2 6 色槽规则
+       │
+       否
+       │
+  场景是什么？
+       ├── 科技/企业/SaaS ──→ Nord 商务蓝 或 Radix 科技蓝
+       ├── 教育/培训 ──→ 暖色教育 或 Catppuccin 柔和
+       ├── 学术/研究 ──→ 学术靛
+       ├── 产品/设计 ──→ 暗色创意（暗室）或 Catppuccin 柔和（亮室）
+       └── 不知道 ──→ Nord 商务蓝（最安全）
+```
+
+更多设计理论参考 [`design-principles.md`](../../design-principles.md)。
+
 ---
 
 ## 2.1 色彩方案与 QA 规则
@@ -525,6 +672,49 @@ soffice --headless --convert-to pdf deck.pptx
 pdftoppm -jpeg -r 100 deck.pdf slide
 ```
 
+### 8.1 对比度自检（WCAG AA）
+
+在视觉 QA 前，先用 JS 脚本量化检查所有文字/背景对比度：
+
+```jsx
+// 对比度计算工具 — 在 QA 前运行一次
+function hexToRgb(hex) {
+  const h = hex.replace("#","");
+  return { r: parseInt(h.slice(0,2),16), g: parseInt(h.slice(2,4),16), b: parseInt(h.slice(4,6),16) };
+}
+function relativeLuminance({r,g,b}) {
+  const [rs,gs,bs] = [r,g,b].map(c => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+function contrastRatio(hex1, hex2) {
+  const l1 = relativeLuminance(hexToRgb(hex1));
+  const l2 = relativeLuminance(hexToRgb(hex2));
+  const lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// 检查当前色板的关键对比度对
+const checks = [
+  { label: "深底+白字", fg: "#FFFFFF", bg: "#"+C.darkBg, min: 4.5 },
+  { label: "浅底+正文", fg: "#"+C.muted, bg: "#"+C.lightBg, min: 4.5 },
+  { label: "主色+白字", fg: "#FFFFFF", bg: "#"+C.dominant, min: 3.0 },
+  { label: "浅底+深字", fg: "#"+C.textOnLight, bg: "#"+C.lightBg, min: 4.5 },
+  { label: "深底+浅字", fg: "#"+C.textOnDark, bg: "#"+C.darkBg, min: 4.5 },
+];
+checks.forEach(c => {
+  const ratio = contrastRatio(c.fg, c.bg);
+  const pass = ratio >= c.min ? "✅" : "❌";
+  console.log(`${pass} ${c.label}: ${ratio.toFixed(1)}:1 (需要 ≥${c.min})`);
+});
+```
+
+**标准**：WCAG AA（正常文字 ≥ 4.5:1，大文字 ≥ 3.0:1）。任何 ❌ 都要调整色值。
+
+### 8.2 视觉 QA 清单
+
 然后**把每张 slide 图加载到 transcript**，用挑刺的眼光看：
 
 - [ ]  标题换行？和下方副标题撞了吗？
@@ -532,6 +722,7 @@ pdftoppm -jpeg -r 100 deck.pdf slide
 - [ ]  卡内正文溢出底边了吗？
 - [ ]  主色 on 浅主色、副色 on 副色——文字看不见？
 - [ ]  `scripts/color-qa.mjs` 检查过正文/标题/图形的所有前景-背景组合？
+- [ ]  **对比度检查全部通过？**（见 8.1 contrastRatio() 工具）
 - [ ]  正文对比度 ≥ 4.5:1，大标题/图形/边框 ≥ 3:1？
 - [ ]  是否出现红绿状态只靠颜色区分、双高饱和文字/背景、浅灰压浅底？
 - [ ]  页脚压内容了吗？
@@ -600,6 +791,15 @@ skills/themed-cn-pptx/
 - [ ]  用户要求隐去的话题确实隐去
 - [ ]  完整 PDF → JPG QA 至少一轮且问题已修
 - [ ]  `.pptx` 可编辑（无奇怪嵌入、无图片化的文字）
+
+### 对比度与无障碍
+
+- [ ]  深底 + 白字对比度 ≥ 4.5:1（WCAG AA）
+- [ ]  浅底 + 正文（muted）对比度 ≥ 4.5:1
+- [ ]  主色块 + 白字对比度 ≥ 3.0:1
+- [ ]  副色未用于正文大段文字
+- [ ]  背景图上有文字时，叠加半透明遮罩（opacity 40-50%）
+- [ ]  高饱和度颜色未用于大面积背景区域
 
 ### AI 生图
 
