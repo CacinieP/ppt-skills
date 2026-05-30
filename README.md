@@ -45,23 +45,44 @@ Start from a manuscript/outline/README, build a complete deck from scratch.
 
 ## AI Image Generation (StepFun)
 
-To enable AI-generated images in your decks, set the `STEPFUN_API_KEY` environment variable:
+`stepfun-image.js` automatically loads `.env` on import — **no dotenv dependency, no boilerplate** in your build scripts. Just import and call.
 
-```bash
-# Required: Get your key from https://platform.stepfun.com
-export STEPFUN_API_KEY=sk-xxx
+### Three ways to provide your API key (pick one)
 
-# Optional: Override API base URL (defaults to https://api.stepfun.com/v1)
-export STEPFUN_BASE_URL=https://api.stepfun.com/v1
+**1. `.env` file (recommended for local dev)**
+
+Create `.env` in your project root (already gitignored):
+
+```
+STEPFUN_API_KEY=sk-xxx
+STEPFUN_BASE_URL=https://api.stepfun.com/v1   # optional
 ```
 
-**Claude Code users** can configure via MCP:
+That's it. `stepfun-image.js` reads it on import — your `build_*.js` needs zero env-handling code.
+
+**2. Shell environment variable**
+
+```bash
+export STEPFUN_API_KEY=sk-xxx
+export STEPFUN_BASE_URL=https://api.stepfun.com/v1   # optional
+node build_miku.js
+```
+
+**3. Claude Code MCP config**
 
 ```bash
 claude mcp add stepfun -s user -e STEPFUN_API_KEY=sk-xxx -- npx -y @stepfun/mcp-server
 ```
 
-When `STEPFUN_API_KEY` is set, `generateSlideImage()` will call the StepFun API to create illustrations; when not set, it gracefully degrades to solid-color placeholders without errors.
+### Priority order
+
+`process.env` (shell / MCP / CI) **>** `.env` file
+
+If you set the key via `export` or MCP, the `.env` value is ignored — so CI/CD and Claude Code always win.
+
+### What happens without a key
+
+`generateSlideImage()` returns `null` and prints a warning. Your PPTX still generates — just without AI images (falls back to solid-color placeholders). No crash, no error throw.
 
 ### Size-to-Layout Mapping
 
@@ -140,23 +161,44 @@ MIT
 
 ## AI 生图（阶跃星辰 StepFun）
 
-启用 AI 配图需要设置环境变量 `STEPFUN_API_KEY`：
+`stepfun-image.js` 在 import 时自动加载 `.env` —— **零依赖、零样板代码**。只需 import 然后调用。
 
-```bash
-# 必填：从 https://platform.stepfun.com 获取 API Key
-export STEPFUN_API_KEY=sk-xxx
+### 三种方式填入 API Key（任选其一）
 
-# 可选：覆盖 API 地址（默认 https://api.stepfun.com/v1）
-export STEPFUN_BASE_URL=https://api.stepfun.com/v1
+**1. `.env` 文件（本地开发推荐）**
+
+在项目根目录创建 `.env`（已被 gitignore 忽略）：
+
+```
+STEPFUN_API_KEY=sk-xxx
+STEPFUN_BASE_URL=https://api.stepfun.com/v1   # 可选
 ```
 
-**Claude Code 用户**可通过 MCP 配置：
+就这样。`stepfun-image.js` import 时自动读取，你的 `build_*.js` 不需要任何 env 处理代码。
+
+**2. Shell 环境变量**
+
+```bash
+export STEPFUN_API_KEY=sk-xxx
+export STEPFUN_BASE_URL=https://api.stepfun.com/v1   # 可选
+node build_miku.js
+```
+
+**3. Claude Code MCP 配置**
 
 ```bash
 claude mcp add stepfun -s user -e STEPFUN_API_KEY=sk-xxx -- npx -y @stepfun/mcp-server
 ```
 
-设置 `STEPFUN_API_KEY` 后，`generateSlideImage()` 会调用 StepFun API 生成配图；未设置时自动降级为纯色占位，不会报错。
+### 优先级
+
+`process.env`（Shell / MCP / CI）**>** `.env` 文件
+
+如果通过 `export` 或 MCP 设置了 key，`.env` 中的值会被跳过——CI/CD 和 Claude Code 配置始终优先。
+
+### 没有 Key 时会怎样
+
+`generateSlideImage()` 返回 `null` 并打印警告。PPTX 照常生成——只是没有 AI 配图（降级为纯色占位）。不会崩溃，不会抛错。
 
 ## 贡献
 

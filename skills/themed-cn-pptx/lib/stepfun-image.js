@@ -4,9 +4,12 @@
  * Integrates StepFun (阶跃星辰) text-to-image API into PPTX generation workflow.
  * Automatically selects image size based on PPT slide usage context.
  *
- * Environment Variables:
+ * Environment Variables (read from process.env or .env file):
  *   STEPFUN_API_KEY  — Required. API key from https://platform.stepfun.com
  *   STEPFUN_BASE_URL — Optional. API base URL, defaults to https://api.stepfun.com/v1
+ *
+ * The library automatically loads .env from the current working directory
+ * on first call — no need to install dotenv or copy env-reading boilerplate.
  *
  * Usage in build_<theme>.js:
  *   import { generateSlideImage, addImageToSlide, addImageOverlay, SIZE_MAP } from "./lib/stepfun-image.js";
@@ -18,8 +21,31 @@
  */
 
 import { writeFile, mkdir } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { randomBytes } from "node:crypto";
+
+// ---------------------------------------------------------------------------
+// .env auto-loader (runs once on import, zero dependencies)
+// ---------------------------------------------------------------------------
+{
+  const envPath = resolve(process.cwd(), ".env");
+  try {
+    const content = readFileSync(envPath, "utf-8");
+    for (const line of content.split("\n")) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq === -1) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const value = trimmed.slice(eq + 1).trim();
+      // process.env already set (e.g. by shell or MCP) takes precedence
+      if (!process.env[key]) process.env[key] = value;
+    }
+  } catch {
+    // .env not found is fine — rely on process.env from shell / MCP / CI
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Size mapping: PPT usage → StepFun image size + recommended model
@@ -111,13 +137,10 @@ const MODEL_SIZES = {
 
 // ---------------------------------------------------------------------------
 // Internal: read API key from environment
+// Priority: process.env (shell/MCP/CI) > .env file (auto-loaded above)
 // ---------------------------------------------------------------------------
 function getApiKey() {
-  const key = process.env.STEPFUN_API_KEY;
-  if (!key) {
-    return null;
-  }
-  return key;
+  return process.env.STEPFUN_API_KEY || null;
 }
 
 function getBaseUrl() {
@@ -148,7 +171,10 @@ export async function generateSlideImage(params) {
     console.warn(
       "[stepfun-image] STEPFUN_API_KEY 未设置，跳过 AI 生图。\n" +
       "  获取 API Key: https://platform.stepfun.com\n" +
-      "  设置方式: export STEPFUN_API_KEY=sk-xxx"
+      "  设置方式（三选一）：\n" +
+      "    1. 项目根目录创建 .env 文件: STEPFUN_API_KEY=sk-xxx\n" +
+      "    2. Shell 环境变量: export STEPFUN_API_KEY=sk-xxx\n" +
+      "    3. Claude Code MCP: claude mcp add stepfun -e STEPFUN_API_KEY=sk-xxx"
     );
     return null;
   }
