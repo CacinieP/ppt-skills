@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
+
 const ROLE_THRESHOLDS = {
   body: 4.5,
   title: 3,
@@ -87,13 +89,14 @@ function pairWarnings(foreground, background, role = "body") {
   const ratio = contrastRatio(fg, bg);
   const threshold = ROLE_THRESHOLDS[role] || ROLE_THRESHOLDS.body;
   const warnings = [];
+  const addWarning = (severity, code, message) => warnings.push({ severity, code, message });
 
   if (ratio < threshold) {
-    warnings.push(`FAIL_CONTRAST: ${ratio.toFixed(2)}:1 < ${threshold}:1 for ${role}`);
+    addWarning("P0", "FAIL_CONTRAST", `${ratio.toFixed(2)}:1 < ${threshold}:1 for ${role}`);
   }
 
   if (fgHsl.s > 0.65 && bgHsl.s > 0.65 && ratio < 7) {
-    warnings.push("HIGH_SATURATION_PAIR: two saturated colors need extra contrast or a neutral buffer");
+    addWarning("P1", "HIGH_SATURATION_PAIR", "two saturated colors need extra contrast or a neutral buffer");
   }
 
   const fgIsRed = isHueInRange(fgHsl.h, 345, 20);
@@ -101,7 +104,7 @@ function pairWarnings(foreground, background, role = "body") {
   const fgIsGreen = isHueInRange(fgHsl.h, 85, 155);
   const bgIsGreen = isHueInRange(bgHsl.h, 85, 155);
   if ((fgIsRed && bgIsGreen) || (fgIsGreen && bgIsRed)) {
-    warnings.push("RED_GREEN_PAIR: unsafe for status-only meaning and color-vision deficiencies");
+    addWarning("P1", "RED_GREEN_PAIR", "unsafe for status-only meaning and color-vision deficiencies");
   }
 
   const fgIsBlue = isHueInRange(fgHsl.h, 210, 270);
@@ -109,22 +112,30 @@ function pairWarnings(foreground, background, role = "body") {
   const fgIsOrangeRed = isHueInRange(fgHsl.h, 0, 45);
   const bgIsBlue = isHueInRange(bgHsl.h, 210, 270);
   if ((fgIsBlue && bgIsOrangeRed) || (fgIsOrangeRed && bgIsBlue)) {
-    warnings.push("BLUE_ON_ORANGE_RED: prone to edge vibration in dense CJK text");
+    addWarning("P1", "BLUE_ON_ORANGE_RED", "prone to edge vibration in dense CJK text");
   }
 
   if (hueDistance(fgHsl.h, bgHsl.h) < 18 && Math.abs(fgHsl.l - bgHsl.l) < 0.28 && ratio < 4.5) {
-    warnings.push("SAME_HUE_LOW_LUMINANCE_DELTA: too close in both hue and brightness");
+    addWarning("P1", "SAME_HUE_LOW_LUMINANCE_DELTA", "too close in both hue and brightness");
   }
 
   if (fgHsl.s > 0.8 && bgHsl.l > 0.86 && ratio < 4.5) {
-    warnings.push("NEON_ON_LIGHT: bright saturated text on light background often looks thin");
+    addWarning("P1", "NEON_ON_LIGHT", "bright saturated text on light background often looks thin");
   }
+
+  const severity = warnings.some((warning) => warning.severity === "P0")
+    ? "P0"
+    : warnings.some((warning) => warning.severity === "P1")
+    ? "P1"
+    : "PASS";
 
   return {
     foreground: `#${fg.hex}`,
     background: `#${bg.hex}`,
     role,
     ratio: Number(ratio.toFixed(2)),
+    threshold,
+    severity,
     pass: warnings.length === 0,
     warnings,
   };
@@ -147,29 +158,74 @@ function parseArgs(argv) {
   return args;
 }
 
+function resultsSummary(results) {
+  return {
+    pass: results.every((result) => result.pass),
+    total: results.length,
+    p0: results.filter((result) => result.severity === "P0").length,
+    p1: results.filter((result) => result.severity === "P1").length,
+    passCount: results.filter((result) => result.severity === "PASS").length,
+  };
+}
+
+function runPalette(colors, role) {
+  const results = [];
+  for (let i = 0; i < colors.length; i++) {
+    for (let j = i + 1; j < colors.length; j++) {
+      results.push(pairWarnings(colors[i], colors[j], role));
+    }
+  }
+  return results;
+}
+
+function runJsonInput(input) {
+  const results = [];
+
+  if (Array.isArray(input.pairs)) {
+    for (const pair of input.pairs) {
+      const result = pairWarnings(pair.fg || pair.foreground, pair.bg || pair.background, pair.role || input.role || "body");
+      if (pair.name) result.name = pair.name;
+      results.push(result);
+    }
+  }
+
+  if (Array.isArray(input.palette)) {
+    const paletteResults = runPalette(input.palette, input.role || "body");
+    results.push(...paletteResults);
+  }
+
+  return {
+    summary: resultsSummary(results),
+    results,
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   const role = args.role || "body";
 
+  if (args.json) {
+    const input = JSON.parse(readFileSync(args.json, "utf-8"));
+    console.log(JSON.stringify(runJsonInput(input), null, 2));
+    return;
+  }
+
   if (args.palette) {
     const colors = args.palette.split(",").map((color) => color.trim()).filter(Boolean);
-    const results = [];
-    for (let i = 0; i < colors.length; i++) {
-      for (let j = i + 1; j < colors.length; j++) {
-        results.push(pairWarnings(colors[i], colors[j], role));
-      }
-    }
-    console.log(JSON.stringify(results, null, 2));
+    const results = runPalette(colors, role);
+    console.log(JSON.stringify({ summary: resultsSummary(results), results }, null, 2));
     return;
   }
 
   if (!args.fg || !args.bg) {
     console.error("Usage: node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body");
     console.error("   or: node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body");
+    console.error("   or: node scripts/color-qa.mjs --json palette.json");
     process.exit(2);
   }
 
-  console.log(JSON.stringify(pairWarnings(args.fg, args.bg, role), null, 2));
+  const result = pairWarnings(args.fg, args.bg, role);
+  console.log(JSON.stringify({ summary: resultsSummary([result]), results: [result] }, null, 2));
 }
 
 main();

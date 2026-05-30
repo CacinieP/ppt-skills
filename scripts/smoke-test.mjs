@@ -65,6 +65,12 @@ if (getImageUsageConfig("cover", "minimax-global").aspectRatio !== "16:9") {
 if (!listImageUsages("minimax-cn").some((usage) => usage.usage === "phoneMockup" && usage.aspectRatio === "9:16")) {
   throw new Error("MiniMax phoneMockup usage mapping missing");
 }
+if (getImageUsageConfig("ultraWideHero", "minimax-global").aspectRatio !== "21:9") {
+  throw new Error("MiniMax ultraWideHero should map to 21:9");
+}
+if (getImageUsageConfig("ultraWideHero", "stepfun-cn").cropPolicy !== "crop-from-16:9-title-safe-left") {
+  throw new Error("StepFun ultraWideHero should expose crop policy");
+}
 
 let skipped;
 try {

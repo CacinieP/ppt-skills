@@ -1,6 +1,6 @@
 {
   "name": "ppt-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows and AI image helpers.",
   "type": "module",
   "repository": {

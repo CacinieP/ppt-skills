@@ -1,0 +1,18 @@
+{
+  "role": "body",
+  "pairs": [
+    {
+      "name": "body on paper",
+      "fg": "0F2233",
+      "bg": "F1FBFA",
+      "role": "body"
+    },
+    {
+      "name": "accent on paper",
+      "fg": "FF77AA",
+      "bg": "F1FBFA",
+      "role": "body"
+    }
+  ],
+  "palette": ["0F2233", "F1FBFA", "39C5BB", "FF77AA"]
+}

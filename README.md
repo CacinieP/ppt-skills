@@ -39,6 +39,7 @@ If no API key is configured, the helper returns `null` and your build can fall b
 | `npm run smoke` | Same as `npm test` |
 | `npm run color:qa -- --fg 0F2233 --bg F1FBFA --role body` | Check one foreground/background pair |
 | `npm run color:qa -- --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body` | Check all pairs in a palette |
+| `npm run color:qa -- --json examples/color-qa.sample.json` | Check named pairs/palette JSON and return P0/P1 summary |
 
 ## Repository Layout
 
@@ -46,12 +47,17 @@ If no API key is configured, the helper returns `null` and your build can fall b
 ppt-skills/
   README.md
   package.json
+  examples/
+    color-qa.sample.json
   scripts/
     smoke-test.mjs
     color-qa.mjs
   skills/
     themed-cn-pptx/
       skill.md
+      references/
+        aesthetic-rules.md
+        image-constraints.md
       lib/
         ai-image.js
         stepfun-image.js
@@ -65,6 +71,15 @@ ppt-skills/
 - **Two workflows**: modify an existing deck, or generate a full deck from a manuscript or outline.
 - **Provider-aware AI images**: use StepFun (recommended) or MiniMax, with CN/global regions and PPT-friendly usage presets like `cover`, `card`, `showcase`, and `phoneMockup`.
 - **Graceful degradation**: if no image API key is configured, builds continue and return `null` for generated images.
+
+## What This Adds Compared With Similar Tools
+
+| Source | Useful Pattern | What `ppt-skills` adopts |
+| --- | --- | --- |
+| `slide-editor` | HTML/CSS preview pipeline and fixed canvas thinking | explicit PPT layout contracts and size-safe image slots |
+| `slides-from-anything` | manuscript-to-deck product workflow | two workflows: modify existing PPT or generate from source |
+| `guizang-ppt-skill` | locked aesthetic systems and strict image prompting | `references/aesthetic-rules.md` and `references/image-constraints.md` |
+| This repo | editable PptxGenJS + Chinese QA | CJK typography, QR, render QA, color QA, StepFun/MiniMax provider layer |
 
 ## Skills
 
@@ -253,6 +268,8 @@ Official references:
 | `cover` | Full-bleed cover background | `1360x768` | `16:9` | `10 x 5.625 in` |
 | `coverOverlay` | Cover background with text overlay | `1360x768` | `16:9` | `10 x 5.625 in` |
 | `hero` | Top banner | `1360x768` | `16:9` | `10 x 3 in` |
+| `bannerWide` | Ultra-wide banner | `1360x768` + crop | `21:9` | `10 x 2.45 in` |
+| `ultraWideHero` | Ultra-wide title visual | `1360x768` + crop | `21:9` | `10 x 2.8 in` |
 | `sideStrip` | Vertical side decoration | `768x1360` | `9:16` | `2.5 x 4.44 in` |
 | `card` | Square card image | `1024x1024` | `1:1` | `2.5 x 2.5 in` |
 | `cardTall` | Tall card image | `896x1184` | `3:4` | `2.3 x 3.04 in` |
@@ -264,6 +281,7 @@ Official references:
 Image adaptation rules:
 
 - StepFun `step-image-edit-2` uses official `size` strings. Keep the PPT usage mapping fixed: `cover/hero -> 1360x768`, `showcase/cardWide -> 1184x896`, `phoneMockup/sideStrip -> 768x1360`.
+- `bannerWide` and `ultraWideHero`: MiniMax uses native `21:9`; StepFun uses `1360x768` and relies on the returned `cropPolicy`/`safeZone` metadata for PPT placement.
 - StepFun text-to-image is treated as one image per request; call repeatedly for multiple candidates.
 - MiniMax should normally use `aspect_ratio`; only pass `width/height` for custom sizes, and keep both in `[512, 2048]` and divisible by 8.
 - Use `getImageUsageConfig(usage, provider)` or `SIZE_MAP`; do not hand-mix StepFun concrete sizes with MiniMax ratios.
@@ -278,6 +296,8 @@ Generated image metadata includes:
   absolutePath,
   size,
   aspectRatio,
+  cropPolicy,
+  safeZone,
   model,
   seed,
   usage,
@@ -292,6 +312,7 @@ Use sRGB relative luminance, not raw RGB distance, to judge text/background safe
 ```bash
 node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body
 node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
+node scripts/color-qa.mjs --json examples/color-qa.sample.json
 ```
 
 Rules:
@@ -380,6 +401,7 @@ import { generateSlideImage } from "./lib/ai-image.js";
 | `npm run smoke` | 同 `npm test` |
 | `npm run color:qa -- --fg 0F2233 --bg F1FBFA --role body` | 检查一组前景/背景色 |
 | `npm run color:qa -- --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body` | 检查调色板两两组合 |
+| `npm run color:qa -- --json examples/color-qa.sample.json` | 检查命名色彩组合并输出 P0/P1 汇总 |
 
 ## 核心能力
 
@@ -503,6 +525,8 @@ const cover = await generateSlideImage({
 | --- | --- | --- | --- | --- |
 | `cover` | 全幅封面背景 | `1360x768` | `16:9` | `10 x 5.625 in` |
 | `hero` | 顶部横幅 | `1360x768` | `16:9` | `10 x 3 in` |
+| `bannerWide` | 超宽横幅 | `1360x768` + 裁切 | `21:9` | `10 x 2.45 in` |
+| `ultraWideHero` | 超宽首页/章节视觉 | `1360x768` + 裁切 | `21:9` | `10 x 2.8 in` |
 | `sideStrip` | 竖向侧栏 | `768x1360` | `9:16` | `2.5 x 4.44 in` |
 | `card` | 方形卡片图 | `1024x1024` | `1:1` | `2.5 x 2.5 in` |
 | `cardTall` | 竖版卡片图 | `896x1184` | `3:4` | `2.3 x 3.04 in` |
@@ -514,6 +538,7 @@ const cover = await generateSlideImage({
 图片尺寸适配规则：
 
 - StepFun `step-image-edit-2` 使用官方 `size` 字符串；PPT 用途固定映射：`cover/hero -> 1360x768`，`showcase/cardWide -> 1184x896`，`phoneMockup/sideStrip -> 768x1360`。
+- `bannerWide` / `ultraWideHero`：MiniMax 原生 `21:9`；StepFun 用 `1360x768` 生成，再按返回的 `cropPolicy` / `safeZone` 元数据放入 PPT。
 - StepFun 文生图按单次 1 张处理；需要多张候选图时循环调用。
 - MiniMax 默认用 `aspect_ratio`；只有自定义尺寸时才传 `width/height`，并保证 512-2048 且可被 8 整除。
 - 用 `getImageUsageConfig(usage, provider)` 或 `SIZE_MAP` 取配置，不手写混用 StepFun 尺寸和 MiniMax 比例。
@@ -525,6 +550,7 @@ const cover = await generateSlideImage({
 ```bash
 node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body
 node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
+node scripts/color-qa.mjs --json examples/color-qa.sample.json
 ```
 
 规则：

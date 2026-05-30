@@ -67,6 +67,8 @@ description: Build or modify Chinese + IP/character-themed + QR-embeddable edita
 - **硬约束** → 页数上限、二维码目标 URL、需隐去的话题、品牌标识
 - **内容源** → 用户粘贴的文本？GitHub README？现有 Notion 页？先抓取再写 slide
 - **图像需求** → 哪些页需要 AI 配图？封面背景？卡片插图？项目展示？→ 参考 §2.5 确定用途和尺寸
+- **视觉系统** → 对复杂/公开发布 deck，先读 `references/aesthetic-rules.md`，声明 `style_id`、布局族、密度和负面风格
+- **生图约束** → 生成封面/hero/showcase 前先读 `references/image-constraints.md`，写出 image manifest 再调用 API
 
 ---
 
@@ -197,6 +199,8 @@ await generateSlideImage({ provider: "minimax-global", prompt, usage: "card" });
 | `cover` | 封面全幅背景 | 1360×768 | 16:9 | `{ w:10, h:5.625 }` |
 | `coverOverlay` | 带文字遮罩的封面背景 | 1360×768 | 16:9 | `{ w:10, h:5.625 }` |
 | `hero` | 上半区横幅 | 1360×768 | 16:9 | `{ w:10, h:3 }` |
+| `bannerWide` | 超宽横幅 | 1360×768 + 裁切 | 21:9 | `{ w:10, h:2.45 }` |
+| `ultraWideHero` | 超宽首页/章节视觉 | 1360×768 + 裁切 | 21:9 | `{ w:10, h:2.8 }` |
 | `sideStrip` | 右侧竖版装饰条 | 768×1360 | 9:16 | `{ w:2.5, h:4.44 }` |
 | `card` | 方形卡片配图 | 1024×1024 | 1:1 | `{ w:2.5, h:2.5 }` |
 | `cardTall` | 竖版卡片配图 | 896×1184 | 3:4 | `{ w:2.3, h:3.04 }` |
@@ -210,7 +214,8 @@ await generateSlideImage({ provider: "minimax-global", prompt, usage: "card" });
 - StepFun `step-image-edit-2` 使用官方 `size` 字符串：`1024x1024`、`768x1360`、`896x1184`、`1360x768`、`1184x896`。文档标注该字符串是 `height x width`，但在本 skill 中按**视觉用途**映射到 PPT：`cover/hero` 固定用 `1360x768`，`showcase/cardWide` 固定用 `1184x896`，`phoneMockup/sideStrip` 固定用 `768x1360`。
 - StepFun 当前单次文生图按 1 张处理；如需要多张候选图，循环调用，不依赖 `n > 1`。
 - MiniMax 优先使用 `aspect_ratio` 而不是 `width/height`：`16:9`、`4:3`、`1:1`、`3:4`、`9:16`。只有确实需要自定义像素时才传 `width/height`，并保证 512-2048 且能被 8 整除。
-- `cover`、`hero`、`showcase`、`phoneMockup` 不手写尺寸，统一从 `SIZE_MAP` 或 `getImageUsageConfig()` 取，避免把 MiniMax ratio 和 StepFun size 混用。
+- `cover`、`hero`、`bannerWide`、`ultraWideHero`、`showcase`、`phoneMockup` 不手写尺寸，统一从 `SIZE_MAP` 或 `getImageUsageConfig()` 取，避免把 MiniMax ratio 和 StepFun size 混用。
+- `bannerWide` / `ultraWideHero`：MiniMax 原生 `21:9`；StepFun 用 `1360x768` 生成，再按 `cropPolicy` 和 `safeZone` 放入 PPT。
 - 返回 URL 一律立即下载到 `assets/<provider>/`，PPTX 只引用本地文件，避免 StepFun/MiniMax 临时链接过期。
 
 ### 环境变量配置
@@ -550,6 +555,9 @@ pdftoppm -jpeg -r 100 -f N -l N deck.pdf slide-fix
 ```
 skills/themed-cn-pptx/
   skill.md                     # 本文档
+  references/
+    aesthetic-rules.md         # 视觉系统与美学负面清单
+    image-constraints.md       # 生图 manifest、尺寸、负面 prompt
   lib/
     ai-image.js                # StepFun / MiniMax 通用生图工具库
     stepfun-image.js           # 旧脚本兼容入口，re-export ai-image.js

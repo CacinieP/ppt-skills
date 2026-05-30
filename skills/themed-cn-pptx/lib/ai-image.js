@@ -153,6 +153,40 @@ export const SIZE_MAP = {
     description: "Hero banner，页面上半区横幅，16:9 裁切为约 10x3 in",
     pptxLayout: { w: 10, h: 3.0 },
   },
+  bannerWide: {
+    size: "1360x768",
+    aspectRatio: "21:9",
+    model: "step-image-edit-2",
+    providers: {
+      stepfun: {
+        size: "1360x768",
+        model: "step-image-edit-2",
+        cropPolicy: "crop-from-16:9-center-safe",
+      },
+      minimax: { aspectRatio: "21:9", model: "image-01" },
+    },
+    description: "超宽横幅，MiniMax 用 21:9，StepFun 用 16:9 中心安全区裁切",
+    pptxLayout: { w: 10, h: 2.45 },
+    safeZone: "center 80% width, middle 60% height",
+    cropPolicy: "crop-from-16:9-center-safe",
+  },
+  ultraWideHero: {
+    size: "1360x768",
+    aspectRatio: "21:9",
+    model: "step-image-edit-2",
+    providers: {
+      stepfun: {
+        size: "1360x768",
+        model: "step-image-edit-2",
+        cropPolicy: "crop-from-16:9-title-safe-left",
+      },
+      minimax: { aspectRatio: "21:9", model: "image-01" },
+    },
+    description: "超宽首页/章节视觉，保留左侧标题安全区",
+    pptxLayout: { w: 10, h: 2.8 },
+    safeZone: "left 45% title-safe, avoid text/logos in image",
+    cropPolicy: "crop-from-16:9-title-safe-left",
+  },
   sideStrip: {
     size: "768x1360",
     aspectRatio: "9:16",
@@ -268,6 +302,8 @@ export function getImageUsageConfig(usage = "card", providerInput = "stepfun") {
     model: providerSpec.model || sizeConfig.model || IMAGE_PROVIDERS[provider].defaultModel,
     size: providerSpec.size || sizeConfig.size,
     aspectRatio: providerSpec.aspectRatio || sizeConfig.aspectRatio,
+    cropPolicy: providerSpec.cropPolicy || sizeConfig.cropPolicy || "fit",
+    safeZone: providerSpec.safeZone || sizeConfig.safeZone || null,
     pptxLayout: sizeConfig.pptxLayout,
     description: sizeConfig.description,
   };
@@ -648,6 +684,8 @@ function buildImageInfo(ctx, meta, file, extra = {}) {
     size: meta.size,
     aspectRatio: meta.aspectRatio,
     pixelAspectRatio: meta.pixelAspectRatio,
+    cropPolicy: meta.cropPolicy || ctx.sizeConfig.cropPolicy || null,
+    safeZone: ctx.sizeConfig.safeZone || null,
     model: meta.model,
     seed: extra.seed,
     pptxLayout: ctx.sizeConfig.pptxLayout,
