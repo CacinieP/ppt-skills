@@ -1,0 +1,32 @@
+# Environment variables — NEVER commit API keys
+.env
+.env.local
+.env.*.local
+
+# StepFun generated images
+assets/
+
+# Node
+node_modules/
+package.json
+package-lock.json
+
+# Build scripts & output (local artifacts, not skill code)
+build_*.js
+*.pptx
+*.pdf
+slide-*.jpg
+
+# Temp / test files
+read_pptx.py
+test-*.js
+plan.md
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
