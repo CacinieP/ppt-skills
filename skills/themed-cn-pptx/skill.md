@@ -14,6 +14,19 @@ description: Build or modify Chinese + IP/character-themed + QR-embeddable edita
 
 **生图能力**：集成 StepFun 阶跃星辰和 MiniMax 文生图 API，API Key 从环境变量读取，不硬编码
 
+**适合**：
+- 中文 PPT、IP/角色主题 PPT
+- 需要 AI 配图（StepFun / MiniMax）
+- 需要嵌入二维码
+- 需要 PDF→JPG 渲染 QA 闭环
+- 需要可编辑 PPTX（不是图片化幻灯片）
+
+**不适合**：
+- 只要普通商务模板（用标准 pptx skill）
+- 只要 PDF 输出（用 PDF 工具）
+- 不要求可编辑（直接截图即可）
+- 单页海报/非演示文稿（用设计工具）
+
 </aside>
 
 ---
@@ -83,7 +96,7 @@ description: Build or modify Chinese + IP/character-themed + QR-embeddable edita
 | Dark BG 深底 | 封面 / 分隔 / 收尾 | `#0B1B2B` 深夜空蓝 |
 | Light BG 浅底 | 内容页 | `#F1FBFA` 青调米白 |
 | Soft accent 柔和点缀 | chips / 浅卡背景 | `#E6F8F6` |
-| Muted text 弱化文字 | 浅底正文 | `#6B8794` |
+| Muted text 弱化文字 | 浅底正文 | `#59707B` |
 
 **权重规则**：
 
@@ -94,10 +107,10 @@ description: Build or modify Chinese + IP/character-themed + QR-embeddable edita
 可复用的 JS 常量块：
 
 ```jsx
-const C = { miku:"39C5BB", mikuDeep:"1FA89E", pink:"FF77AA", pinkSoft:"FFC2DB",
+const C = { miku:"39C5BB", mikuDeep:"1C9990", pink:"FF77AA", pinkSoft:"FFC2DB",
   navy:"0B1B2B", navyDeep:"06121E", ink:"0F2233",
   paper:"F1FBFA", paperAlt:"E6F8F6", white:"FFFFFF",
-  textOnDark:"E8FFFD", textOnLight:"0F2233", muted:"6B8794", line:"BFE7E2" };
+  textOnDark:"E8FFFD", textOnLight:"0F2233", muted:"59707B", line:"BFE7E2" };
 ```
 
 换 IP 时只替换具名颜色，**色槽结构保持不变**。
@@ -125,7 +138,7 @@ const C = {
   muted: "4C566A", line: "D8DEE9"
 };
 ```
-验证：白字 on `#2E3440` = 12.3:1 ✅ | `#4C566A` on `#ECEFF4` = 5.8:1 ✅
+验证：白字 on `#2E3440` = 12.5:1 ✅ | `#4C566A` on `#ECEFF4` = 6.4:1 ✅ | 深字 on `#88C0D0` = 5.0:1 ✅（浅主色用深字）
 
 #### 🐱 Catppuccin 柔和
 
@@ -143,10 +156,10 @@ const C = {
   // 中性
   white: "FFFFFF", ink: "4C4F69",
   textOnDark: "EFF1F5", textOnLight: "4C4F69",
-  muted: "7C7F93", line: "BCC0CC"
+  muted: "646777", line: "BCC0CC"
 };
 ```
-验证：白字 on `#4C4F69` = 7.1:1 ✅ | `#7C7F93` on `#EFF1F5` = 4.7:1 ✅
+验证：白字 on `#4C4F69` = 8.0:1 ✅ | `#646777` on `#EFF1F5` = 5.0:1 ✅
 
 #### 💎 Radix 科技蓝
 
@@ -185,10 +198,10 @@ const C = {
   // 中性
   white: "FFFFFF", ink: "2C3E2D",
   textOnDark: "D4E8D5", textOnLight: "2C3E2D",
-  muted: "5E7A5F", line: "C0D4C0"
+  muted: "587259", line: "C0D4C0"
 };
 ```
-验证：白字 on `#1A2332` = 13.5:1 ✅ | `#5E7A5F` on `#F7F9F4` = 4.9:1 ✅
+验证：白字 on `#1A2332` = 15.8:1 ✅ | `#587259` on `#F7F9F4` = 5.0:1 ✅
 
 #### 🎓 学术靛
 
@@ -227,10 +240,10 @@ const C = {
   // 中性
   white: "FFFFFF", ink: "11111B",
   textOnDark: "CDD6F4", textOnLight: "CDD6F4",
-  muted: "6C7086", line: "45475A"
+  muted: "8C92AE", line: "45475A"
 };
 ```
-验证：`#CDD6F4` on `#1E1E2E` = 10.3:1 ✅ | `#6C7086` on `#2A2A3C` = 3.8:1（大文字 OK，正文用 `textOnDark`）
+验证：`#CDD6F4` on `#1E1E2E` = 11.3:1 ✅ | `#8C92AE` on `#2A2A3C` = 4.6:1 ✅ | 深字 on `#89B4FA` = 8.9:1 ✅（浅主色用深字）
 
 ### 色板选择决策树
 
@@ -441,6 +454,7 @@ STEPFUN_API_MODE=platform
 ### 图片排版规范
 
 - **深底图片上放文字** → 必须加半透明遮罩（`addImageOverlay`），透明度 40-50%
+- **注意：`addImageOverlay(slide, pres, { opacity: 45 })` 中的 `opacity` 是用户接口参数，传 40–50 的整数；内部映射到 PptxGenJS 的 `transparency`。不要传 0.18 这种比例值。**
 - **卡片内图片** → 上下留 0.15″ padding，用 `rounding: true` 圆角
 - **封面背景图** → 叠加深色半透明矩形 + 文字层，确保文字可读
 - **图片不贴文字** → 左右至少 0.2″ 间距
@@ -700,7 +714,7 @@ function contrastRatio(hex1, hex2) {
 const checks = [
   { label: "深底+白字", fg: "#FFFFFF", bg: "#"+C.darkBg, min: 4.5 },
   { label: "浅底+正文", fg: "#"+C.muted, bg: "#"+C.lightBg, min: 4.5 },
-  { label: "主色+白字", fg: "#FFFFFF", bg: "#"+C.dominant, min: 3.0 },
+  { label: "主色块+文字", fg: "#"+C.ink, bg: "#"+C.dominant, min: 3.0 },
   { label: "浅底+深字", fg: "#"+C.textOnLight, bg: "#"+C.lightBg, min: 4.5 },
   { label: "深底+浅字", fg: "#"+C.textOnDark, bg: "#"+C.darkBg, min: 4.5 },
 ];

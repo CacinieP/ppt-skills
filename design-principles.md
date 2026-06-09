@@ -110,7 +110,7 @@ contrast = (L_light + 0.05) / (L_dark + 0.05)
 ```
 
 **PPT 中的关键检查点**：
-- Muted text (如 `#6B8794`) on Light BG (如 `#F1FBFA`) → 应 ≥ 4.5:1
+- Muted text (如 `#59707B`) on Light BG (如 `#F1FBFA`) → 应 ≥ 4.5:1
 - 白色文字 on Dark BG (如 `#0B1B2B`) → 应 ≥ 4.5:1
 - Dominant 色块上的白色文字 → 应 ≥ 3.0:1
 - **Secondary 绝不用于正文**，因为高饱和度互补色在浅底上通常不达标

@@ -1,0 +1,78 @@
+{
+  "description": "All preset palette contrast pairs. Generated ratios are verified by scripts/color-qa.mjs. Do NOT hand-edit ratio annotations — run: node scripts/color-qa.mjs --json examples/color-qa.presets.json",
+  "presets": [
+    {
+      "name": "Miku",
+      "pairs": [
+        { "name": "body on paper", "fg": "0F2233", "bg": "F1FBFA", "role": "body" },
+        { "name": "muted on paper", "fg": "59707B", "bg": "F1FBFA", "role": "body" },
+        { "name": "accent stripe (decorative, non-text)", "fg": "FF77AA", "bg": "F1FBFA", "role": "graphic", "skipContrastCheck": true },
+        { "name": "textOnDark on navy", "fg": "E8FFFD", "bg": "0B1B2B", "role": "body" },
+        { "name": "white on navy", "fg": "FFFFFF", "bg": "0B1B2B", "role": "body" },
+        { "name": "dark text on dominant", "fg": "0B1B2B", "bg": "39C5BB", "role": "title" },
+        { "name": "white on mikuDeep", "fg": "FFFFFF", "bg": "1C9990", "role": "title" }
+      ]
+    },
+    {
+      "name": "Nord",
+      "pairs": [
+        { "name": "white on darkBg", "fg": "FFFFFF", "bg": "2E3440", "role": "body" },
+        { "name": "muted on lightBg", "fg": "4C566A", "bg": "ECEFF4", "role": "body" },
+        { "name": "ink on lightBg", "fg": "3B4252", "bg": "ECEFF4", "role": "body" },
+        { "name": "textOnDark on darkBg", "fg": "D8DEE9", "bg": "2E3440", "role": "body" },
+        { "name": "ink on dominant (light dominant uses dark text)", "fg": "3B4252", "bg": "88C0D0", "role": "title" },
+        { "name": "white on dominantDeep", "fg": "FFFFFF", "bg": "5E81AC", "role": "title" }
+      ]
+    },
+    {
+      "name": "Catppuccin",
+      "pairs": [
+        { "name": "white on darkBg", "fg": "FFFFFF", "bg": "4C4F69", "role": "body" },
+        { "name": "muted on lightBg", "fg": "646777", "bg": "EFF1F5", "role": "body" },
+        { "name": "ink on lightBg", "fg": "4C4F69", "bg": "EFF1F5", "role": "body" },
+        { "name": "textOnDark on darkBg", "fg": "EFF1F5", "bg": "4C4F69", "role": "body" },
+        { "name": "white on dominant", "fg": "FFFFFF", "bg": "1E66F5", "role": "title" }
+      ]
+    },
+    {
+      "name": "Radix",
+      "pairs": [
+        { "name": "white on darkBg", "fg": "FFFFFF", "bg": "0B1120", "role": "body" },
+        { "name": "muted on lightBg", "fg": "5C6B7F", "bg": "FBFCFF", "role": "body" },
+        { "name": "ink on lightBg", "fg": "0C1A2B", "bg": "FBFCFF", "role": "body" },
+        { "name": "textOnDark on darkBg", "fg": "E1E8F5", "bg": "0B1120", "role": "body" },
+        { "name": "white on dominant", "fg": "FFFFFF", "bg": "0090FF", "role": "title" }
+      ]
+    },
+    {
+      "name": "Warm Education",
+      "pairs": [
+        { "name": "white on darkBg", "fg": "FFFFFF", "bg": "1A2332", "role": "body" },
+        { "name": "muted on lightBg", "fg": "587259", "bg": "F7F9F4", "role": "body" },
+        { "name": "ink on lightBg", "fg": "2C3E2D", "bg": "F7F9F4", "role": "body" },
+        { "name": "textOnDark on darkBg", "fg": "D4E8D5", "bg": "1A2332", "role": "body" },
+        { "name": "white on dominant", "fg": "FFFFFF", "bg": "179299", "role": "title" }
+      ]
+    },
+    {
+      "name": "Academic Indigo",
+      "pairs": [
+        { "name": "white on darkBg", "fg": "FFFFFF", "bg": "1A1A2E", "role": "body" },
+        { "name": "muted on lightBg", "fg": "5C5C7A", "bg": "F5F5FA", "role": "body" },
+        { "name": "ink on lightBg", "fg": "1A1A2E", "bg": "F5F5FA", "role": "body" },
+        { "name": "textOnDark on darkBg", "fg": "D0D0E8", "bg": "1A1A2E", "role": "body" },
+        { "name": "white on dominant", "fg": "FFFFFF", "bg": "3F51B5", "role": "title" }
+      ]
+    },
+    {
+      "name": "Dark Creative",
+      "pairs": [
+        { "name": "textOnDark on darkBg", "fg": "CDD6F4", "bg": "1E1E2E", "role": "body" },
+        { "name": "muted on midBg", "fg": "8C92AE", "bg": "2A2A3C", "role": "body" },
+        { "name": "textOnDark on deepBg", "fg": "CDD6F4", "bg": "11111B", "role": "body" },
+        { "name": "dark text on dominant (light dominant uses dark text)", "fg": "11111B", "bg": "89B4FA", "role": "title" },
+        { "name": "dark text on dominantDeep (light dominant uses dark text)", "fg": "11111B", "bg": "74C7EC", "role": "title" }
+      ]
+    }
+  ]
+}

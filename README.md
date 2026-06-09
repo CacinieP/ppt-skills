@@ -35,11 +35,13 @@ If no API key is configured, the helper returns `null` and your build can fall b
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Smoke-test ESM imports, provider/region aliases, size mappings, and no-key fallback |
-| `npm run smoke` | Same as `npm test` |
+| `npm test` | Smoke-test ESM imports, provider/region aliases, size mappings, no-key fallback, **and preset palette contrast QA** |
+| `npm run smoke` | Same as `npm test` (minus color QA) |
 | `npm run color:qa -- --fg 0F2233 --bg F1FBFA --role body` | Check one foreground/background pair |
 | `npm run color:qa -- --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body` | Check all pairs in a palette |
 | `npm run color:qa -- --json examples/color-qa.sample.json` | Check named pairs/palette JSON and return P0/P1 summary |
+| `npm run color:qa:presets` | Check all preset palettes in `examples/color-qa.presets.json` |
+| `npm run demo` | Generate a 3-slide Miku-themed demo PPTX (no API key needed) |
 
 ## Repository Layout
 
@@ -47,11 +49,18 @@ If no API key is configured, the helper returns `null` and your build can fall b
 ppt-skills/
   README.md
   package.json
+  .github/workflows/
+    ci.yml
   examples/
     color-qa.sample.json
+    color-qa.presets.json
+    build_miku_demo.mjs
+    slides/output/
+      miku-demo.pptx
   scripts/
     smoke-test.mjs
     color-qa.mjs
+    color-qa-presets.mjs
   skills/
     themed-cn-pptx/
       skill.md

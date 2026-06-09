@@ -13,6 +13,7 @@ package-lock.json
 # Build scripts & output (local artifacts, not skill code)
 build_*.js
 *.pptx
+!examples/slides/output/miku-demo.pptx
 *.pdf
 slide-*.jpg
 

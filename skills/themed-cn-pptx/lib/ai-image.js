@@ -331,7 +331,7 @@ export function listImageUsages(providerInput) {
  * @param {number} [params.height]           - MiniMax custom height, with width.
  * @param {string} [params.saveDir]          - Directory for generated images.
  * @param {number} [params.seed]             - Random seed for reproducibility.
- * @param {number} [params.n]                - Number of images. StepFun max 4, MiniMax max 9.
+ * @param {number} [params.n]                - Number of images. StepFun max 1, MiniMax max 9.
  * @param {string} [params.apiMode]          - StepFun only: "platform" or "step_plan".
  * @param {number} [params.steps]            - StepFun generation steps.
  * @param {number} [params.cfgScale]         - StepFun cfg_scale.
