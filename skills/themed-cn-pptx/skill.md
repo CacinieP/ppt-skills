@@ -1,6 +1,6 @@
 ---
 name: themed-cn-pptx
-description: Build or modify Chinese + IP/character-themed + QR-embeddable editable PPTX decks using PptxGenJS, with StepFun or MiniMax AI image generation
+description: Build, modify, and QA-verify Chinese + IP/character-themed + QR-embeddable EDITABLE PPTX decks using PptxGenJS, with StepFun or MiniMax AI image generation, locked aesthetic recipes, and a deterministic render-QA gate (CJK overflow, text overlap, editable-text, color contrast). Triggers: 可编辑 PPTX, 中文 PPT, PPT 验收, render QA, PptxGenJS, presentation, slide, deck, PowerPoint, 演示文稿, 幻灯片.
 ---
 
 <aside>
@@ -535,7 +535,7 @@ function footer(slide, n, total) {
 
 ## 5. Slide 类型菜单
 
-不要每页重新发明 layout。从这些里挑：
+不要每页重新发明 layout。从这些里挑。每个布局的**必需槽位**（stripe / title / footer / pageBadge / image）和**允许的生图 usage** 已登记在 [`references/layout-slots.md`](references/layout-slots.md) —— 那是一份可被 `scripts/render-qa.mjs --contract` 校验的契约，相当于 HTML deck 的 `data-layout` 注册表。交付前用 render-qa 跑一遍，缺槽位会报 P2。
 
 ### 基础布局（无图）
 
@@ -681,6 +681,29 @@ slide.addImage({ path: "/data/qr.png", x: 6.95, y: 2.15, w: 2.4, h: 2.4 });
 
 ## 8. 强制 QA 循环
 
+**先跑自动化门禁，再看图。** 三条命令构成 P0 gate，任一不过都不要交付：
+
+```bash
+# 1. PPTX 渲染 + 启发式 QA —— 溢出 / 遮挡 / 越界 / 图文比例 / 缺页码 badge / 版式契约
+#    P0 findings 退出码 1。本机没装 soffice 时静态检查仍会跑。
+npm run qa:render -- output/deck.pptx --fix-hints \
+  --contract references/layout-slots.md
+
+# 2. 可编辑性 / CJK 字体 / 宏 / 主题完整性
+python3 ../../scripts/pptx-editable-check.py output/deck.pptx
+
+# 3. 色板对比度门禁（WCAG AA）
+node ../../scripts/color-qa.mjs --palette <你的色板> --role body
+```
+
+**生成前**用免渲染估算器预防 CJK 溢出（比渲染一轮再发现快得多）：
+
+```bash
+node ../../scripts/cjk-overflow-check.mjs --text "你的标题" --font-size 44 --box-width 9
+```
+
+自动化门禁全绿后，再做视觉核对（渲染成图逐页挑刺）：
+
 ```bash
 soffice --headless --convert-to pdf deck.pptx
 pdftoppm -jpeg -r 100 deck.pdf slide
@@ -763,9 +786,18 @@ skills/themed-cn-pptx/
   references/
     aesthetic-rules.md         # 视觉系统与美学负面清单
     image-constraints.md       # 生图 manifest、尺寸、负面 prompt
+    layout-slots.md            # 可校验的布局槽位契约（render-qa --contract 消费）
+  recipes/                     # 锁定审美 recipe：可直接跑的 theme + marks + 布局
+    recipe-editorial-grid.mjs  #   中文编辑设计风（克制、发丝线、低饱和）
+    recipe-dark-launch.mjs     #   深底发布风（大对比、hero 配图、CTA/QR）
+    design-contract.md         #   editorial-grid 锁定项说明
+    design-contract-darklaunch.md
   lib/
     ai-image.js                # StepFun / MiniMax 通用生图工具库
     stepfun-image.js           # 旧脚本兼容入口，re-export ai-image.js
+    cjk-text.js                # CJK 宽度估算（QA 工具共享）
+    pptx-shapes.js             # OOXML slide 解析器（render-qa 用）
+    zip-reader.js              # 零依赖 .pptx zip 读取器（render-qa 用）
   examples/
     build_<theme>.js           # 可选：示例构建脚本
 ```

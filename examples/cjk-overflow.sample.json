@@ -1,0 +1,31 @@
+[
+  {
+    "name": "cover title (safe)",
+    "text": "训练场",
+    "fontSize": 44,
+    "boxWidth": 9,
+    "bold": true
+  },
+  {
+    "name": "section title (tight, full-width brackets)",
+    "text": "「智能体从零到一的构建路径」",
+    "fontSize": 28,
+    "boxWidth": 9,
+    "bold": true
+  },
+  {
+    "name": "card title (overflowing)",
+    "text": "这是一个很长的卡片标题用来演示溢出检测器在中等字号下也能正确报警",
+    "fontSize": 16,
+    "boxWidth": 2.5,
+    "bold": true
+  },
+  {
+    "name": "kicker (latin, charSpacing on)",
+    "text": "OPEN SOURCE",
+    "fontSize": 12,
+    "boxWidth": 3,
+    "charSpacing": 4,
+    "bold": true
+  }
+]

@@ -1,7 +1,7 @@
 {
   "name": "ppt-skills",
-  "version": "1.3.0",
-  "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows and AI image helpers.",
+  "version": "1.4.0",
+  "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows, AI image helpers, and a render-QA gate.",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -17,7 +17,9 @@
     "presentation",
     "stepfun",
     "minimax",
-    "ai-image"
+    "ai-image",
+    "render-qa",
+    "qa"
   ],
   "scripts": {
     "color:qa": "node scripts/color-qa.mjs",
@@ -25,7 +27,13 @@
     "smoke": "node scripts/smoke-test.mjs",
     "test": "node scripts/smoke-test.mjs && node scripts/color-qa-presets.mjs",
     "demo": "node examples/build_miku_demo.mjs",
-    "qa:render": "echo 'qa:render requires LibreOffice: soffice --headless --convert-to pdf slides/output/presentation.pptx && pdftoppm -jpeg -r 100 presentation.pdf slide'"
+    "demo:editorial": "node examples/build_editorial_demo.mjs",
+    "demo:darklaunch": "node examples/build_darklaunch_demo.mjs",
+    "demos": "node examples/build_miku_demo.mjs && node examples/build_editorial_demo.mjs && node examples/build_darklaunch_demo.mjs",
+    "qa:render": "node scripts/render-qa.mjs",
+    "qa:cjk": "node scripts/cjk-overflow-check.mjs",
+    "qa:editable": "python3 scripts/pptx-editable-check.py",
+    "qa:all": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx && node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx && node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx"
   },
   "devDependencies": {
     "pptxgenjs": "^4.0.1"

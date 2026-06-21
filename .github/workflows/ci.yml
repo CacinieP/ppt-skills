@@ -29,12 +29,52 @@ jobs:
       - name: Run preset palette contrast QA
         run: node scripts/color-qa-presets.mjs
 
-      - name: Build demo PPTX
-        run: node examples/build_miku_demo.mjs
+      - name: Build all demo PPTX decks
+        run: |
+          node examples/build_miku_demo.mjs
+          node examples/build_editorial_demo.mjs
+          node examples/build_darklaunch_demo.mjs
 
-      - name: Upload demo artifact
+      # Static heuristic QA: CJK overflow, text/shape overlap, off-canvas,
+      # image aspect, page-badge, layout-slot contract. P0 fails the build.
+      - name: render-qa gate on all demo decks
+        run: |
+          node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx
+          node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx
+          node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx
+
+      # Editable-text / CJK-font / macro / theme check.
+      # Python + python-pptx are preinstalled on ubuntu-latest; if a future
+      # runner lacks python-pptx, the script degrades to a zip-only pass and
+      # warns instead of failing.
+      - name: pptx-editable-check on demo decks
+        run: |
+          python3 scripts/pptx-editable-check.py examples/slides/output/miku-demo.pptx
+          python3 scripts/pptx-editable-check.py examples/slides/output/editorial-demo.pptx
+          python3 scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
+
+      # Optional: render to PDF/JPG when LibreOffice + poppler are available
+      # (installed on ubuntu runners). Produces per-slide images for review.
+      - name: Install LibreOffice + poppler for render verification
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice poppler-utils
+
+      - name: render-qa with PDF/JPG render (editorial demo)
+        run: node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --render --out qa-editorial
+
+      - name: Upload demo PPTX artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: miku-demo-node-${{ matrix.node-version }}
-          path: examples/slides/output/miku-demo.pptx
+          name: demos-node-${{ matrix.node-version }}
+          path: |
+            examples/slides/output/miku-demo.pptx
+            examples/slides/output/editorial-demo.pptx
+            examples/slides/output/darklaunch-demo.pptx
+          retention-days: 7
+
+      - name: Upload rendered slide JPGs
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-jpgs-node-${{ matrix.node-version }}
+          path: qa-editorial/*.jpg
+          if-no-files-found: ignore
           retention-days: 7

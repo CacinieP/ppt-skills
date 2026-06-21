@@ -1,0 +1,18 @@
+{
+  "description": "Example inputs for the three QA tools. Each is runnable as documented in README §Commands.",
+  "cjkOverflow": {
+    "run": "node scripts/cjk-overflow-check.mjs --json examples/cjk-overflow.sample.json",
+    "note": "Exit 1 if any box overflows. P0 = overflows by >10%, P1 = tight 0-10%, P2 = trailing full-width punct on a >90%-full box."
+  },
+  "renderQa": {
+    "static": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx --fix-hints",
+    "json": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx --json",
+    "render": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx --render --out ./qa-out",
+    "contract": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx --contract skills/themed-cn-pptx/references/layout-slots.md",
+    "note": "Static checks always run. Render verification needs soffice + poppler on PATH. P0 findings exit 1."
+  },
+  "editableCheck": {
+    "run": "python3 scripts/pptx-editable-check.py examples/slides/output/miku-demo.pptx",
+    "note": "Works without python-pptx (zip-only fallback catches macros, missing theme, flattened slides). Install python-pptx for deep CJK-font coverage."
+  }
+}
