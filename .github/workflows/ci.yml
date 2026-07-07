@@ -6,12 +6,21 @@ on:
   pull_request:
     branches: [main]
 
+# Cancel superseded runs on the same ref so rapid pushes don't queue up.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  # Fast, deterministic gates. Runs on Node 20 and 22.
+  # fail-fast is off so a failure on one Node version can't cancel the other —
+  # each version's signal stays independent.
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [18, 20, 22]
+        node-version: [20, 22]
     steps:
       - uses: actions/checkout@v4
 
@@ -19,9 +28,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
 
-      - name: Install dependencies
-        run: npm install
+      # npm ci installs exactly what package-lock.json pins — reproducible,
+      # no drift, and faster than `npm install`.
+      - name: Install dependencies (locked)
+        run: npm ci
 
       - name: Run smoke tests
         run: node scripts/smoke-test.mjs
@@ -53,14 +65,6 @@ jobs:
           python3 scripts/pptx-editable-check.py examples/slides/output/editorial-demo.pptx
           python3 scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
 
-      # Optional: render to PDF/JPG when LibreOffice + poppler are available
-      # (installed on ubuntu runners). Produces per-slide images for review.
-      - name: Install LibreOffice + poppler for render verification
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice poppler-utils
-
-      - name: render-qa with PDF/JPG render (editorial demo)
-        run: node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --render --out qa-editorial
-
       - name: Upload demo PPTX artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -69,12 +73,42 @@ jobs:
             examples/slides/output/miku-demo.pptx
             examples/slides/output/editorial-demo.pptx
             examples/slides/output/darklaunch-demo.pptx
+          if-no-files-found: error
           retention-days: 7
+
+  # Heavy render verification runs once (Node 22 only), after the fast gates
+  # pass. Installing LibreOffice + poppler on a single node keeps the run fast.
+  render:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies (locked)
+        run: npm ci
+
+      - name: Install LibreOffice + poppler for render verification
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice poppler-utils
+
+      - name: Build editorial demo
+        run: node examples/build_editorial_demo.mjs
+
+      # Full render: PPTX → PDF (LibreOffice) → JPG (poppler), then heuristic
+      # QA runs against the rasterized slides. Produces per-slide images for
+      # human review as artifacts.
+      - name: render-qa with PDF/JPG render (editorial demo)
+        run: node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --render --out qa-editorial
 
       - name: Upload rendered slide JPGs
         uses: actions/upload-artifact@v4
         with:
-          name: qa-jpgs-node-${{ matrix.node-version }}
+          name: qa-jpgs-editorial
           path: qa-editorial/*.jpg
           if-no-files-found: ignore
           retention-days: 7
