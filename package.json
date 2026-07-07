@@ -4,7 +4,7 @@
   "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows, AI image helpers, and a render-QA gate.",
   "type": "module",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "repository": {
     "type": "git",

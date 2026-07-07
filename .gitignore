@@ -8,7 +8,6 @@ assets/
 
 # Node
 node_modules/
-package-lock.json
 
 # Build scripts & output (local artifacts, not skill code)
 build_*.js
