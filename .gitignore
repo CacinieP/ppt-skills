@@ -16,6 +16,9 @@ build_*.js
 *.pdf
 slide-*.jpg
 
+# Local render scratch (PDF/JPG from soffice + pdftoppm)
+render-out/
+
 # Temp / test files
 read_pptx.py
 test-*.js
