@@ -1,460 +1,303 @@
 # PPT Skills
 
-[![License](https://img.shields.io/github/license/CacinieP/ppt-skills?style=flat-square)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/CacinieP/ppt-skills/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/CacinieP/ppt-skills/actions/workflows/ci.yml)
-[![Skills](https://img.shields.io/badge/skills-1%20released-39c5bb?style=flat-square)](skills/)
-[![PPTX](https://img.shields.io/badge/output-editable%20.pptx-0A7CFF?style=flat-square)](#why-this-exists)
+<p align="center">
+  <img src="docs/img/hero-demos.png" alt="ppt-skills demo decks — miku, editorial-grid, dark-launch" width="820" />
+</p>
 
-Open-source skills for generating and **accepting** real, **editable, CJK-aware PPTX decks** built with PptxGenJS. This repo bets on PowerPoint-deliverable `.pptx` (not browser decks), Chinese typography that holds up, and a deterministic QA gate so an Agent-generated deck is verified before delivery — not just eyeballed.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/CacinieP/ppt-skills?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/CacinieP/ppt-skills/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/CacinieP/ppt-skills/ci.yml?branch=main&label=CI&style=flat-square" alt="CI" /></a>
+  <img src="https://img.shields.io/badge/skills-1%20released-39c5bb?style=flat-square" alt="Skills" />
+  <img src="https://img.shields.io/badge/output-editable%20.pptx-0A7CFF?style=flat-square" alt="PPTX" />
+  <img src="https://img.shields.io/badge/node-%E2%89%A5%2020-339933?style=flat-square" alt="Node" />
+</p>
 
-The first released skill, [`themed-cn-pptx`](skills/themed-cn-pptx/), ships two **locked aesthetic recipes** (editorial-grid, dark-launch), a provider-aware AI image layer (StepFun / MiniMax), and three QA tools (render QA, CJK overflow, editable-text check).
+<p align="center">
+  <b>EN</b> · Open-source skills for generating and <b>accepting</b> real, <b>editable, CJK-aware PPTX decks</b> built with PptxGenJS — verified by a deterministic QA gate, not just eyeballed.<br/>
+  <b>中文</b> · 用 PptxGenJS 生成并<b>验收</b>真实、<b>可编辑、适配中文排版的 PPTX</b> 的开源技能合集 —— 由确定性 QA 门禁把关，而非肉眼。
+</p>
 
-## Where this sits vs. `guizang-ppt-skill`
+---
 
-`guizang-ppt-skill` is a mature **single-file HTML horizontal-slide deck** skill — browser-first, strong aesthetic templates. This repo is a different route, not a competitor:
+## 🎬 Demo Gallery · 演示画廊
 
-| Dimension | `guizang-ppt-skill` | `ppt-skills` (this repo) |
-| --- | --- | --- |
-| **Output** | single-file HTML deck, opens in a browser | real, editable `.pptx`, opens in PowerPoint |
-| **Best for** | offline talks, demo days, personal-style keynotes | decks that get delivered as `.pptx`, edited later, or need stable Chinese type |
-| **Not for** | large tables, training material, multi-person editing | browser-only presentation, animated HTML transitions |
-| **Aesthetic system** | two fixed templates (magazine, Swiss) | two locked recipes + an extensible theme system |
-| **QA approach** | HTML layout validator (`data-layout`) | PPTX render + heuristic QA, CJK overflow, editable-text, color contrast |
-| **Image** | Codex/GPT-Image workflow into HTML | provider layer (StepFun/MiniMax) returning PPTX layout metadata |
+Three locked demo decks, all generated from this repo with **zero API keys** (solid-color / hairline fallbacks). Rendered here with LibreOffice at 150 DPI.
 
-**Two routes, complementary.** Pick HTML for browser talks; pick this repo when the deliverable must be a `.pptx`.
+三套锁定 demo，全部本仓库生成，**无需任何 API key**（纯色/发丝线占位回退）。下图用 LibreOffice 150 DPI 渲染。
 
-## 30-second start
+| Deck · 演示 | Slides · 页数 | Recipe · 配方 | Vibe · 风格 |
+| --- | --- | --- | --- |
+| **Miku** | 3 | `miku` (skill showcase) | Teal + pink, dark/light alternation · 青粉撞色，明暗交替 |
+| **Editorial Grid** | 6 | `recipe-editorial-grid.mjs` | Nord neutrals, hairline report look · Nord 中性色，发丝线报告风 |
+| **Dark Launch** | 5 | `recipe-dark-launch.mjs` | Deep navy, oversized type, framed QR close · 深底大字，白框二维码收尾 |
+
+### Miku — skill showcase · 技能展示
+
+<p align="center">
+  <a href="docs/img/demos/miku/miku-slide-1.jpg"><img src="docs/img/demos/miku/miku-slide-1.jpg" width="280" alt="miku cover" /></a>
+  &nbsp;
+  <a href="docs/img/demos/miku/miku-slide-2.jpg"><img src="docs/img/demos/miku/miku-slide-2.jpg" width="280" alt="miku content" /></a>
+  &nbsp;
+  <a href="docs/img/demos/miku/miku-slide-3.jpg"><img src="docs/img/demos/miku/miku-slide-3.jpg" width="280" alt="miku summary" /></a>
+</p>
+
+### Editorial Grid — Nord report look · 编辑报告风
+
+<p align="center">
+  <a href="docs/img/demos/editorial/editorial-slide-1.jpg"><img src="docs/img/demos/editorial/editorial-slide-1.jpg" width="195" alt="editorial s1" /></a>
+  <a href="docs/img/demos/editorial/editorial-slide-2.jpg"><img src="docs/img/demos/editorial/editorial-slide-2.jpg" width="195" alt="editorial s2" /></a>
+  <a href="docs/img/demos/editorial/editorial-slide-3.jpg"><img src="docs/img/demos/editorial/editorial-slide-3.jpg" width="195" alt="editorial s3" /></a>
+  <a href="docs/img/demos/editorial/editorial-slide-4.jpg"><img src="docs/img/demos/editorial/editorial-slide-4.jpg" width="195" alt="editorial s4" /></a>
+  <a href="docs/img/demos/editorial/editorial-slide-5.jpg"><img src="docs/img/demos/editorial/editorial-slide-5.jpg" width="195" alt="editorial s5" /></a>
+  <a href="docs/img/demos/editorial/editorial-slide-6.jpg"><img src="docs/img/demos/editorial/editorial-slide-6.jpg" width="195" alt="editorial s6" /></a>
+</p>
+
+### Dark Launch — keynote close · 发布收尾风
+
+<p align="center">
+  <a href="docs/img/demos/darklaunch/darklaunch-slide-1.jpg"><img src="docs/img/demos/darklaunch/darklaunch-slide-1.jpg" width="232" alt="darklaunch s1" /></a>
+  <a href="docs/img/demos/darklaunch/darklaunch-slide-2.jpg"><img src="docs/img/demos/darklaunch/darklaunch-slide-2.jpg" width="232" alt="darklaunch s2" /></a>
+  <a href="docs/img/demos/darklaunch/darklaunch-slide-3.jpg"><img src="docs/img/demos/darklaunch/darklaunch-slide-3.jpg" width="232" alt="darklaunch s3" /></a>
+  <a href="docs/img/demos/darklaunch/darklaunch-slide-4.jpg"><img src="docs/img/demos/darklaunch/darklaunch-slide-4.jpg" width="232" alt="darklaunch s4" /></a>
+  <a href="docs/img/demos/darklaunch/darklaunch-slide-5.jpg"><img src="docs/img/demos/darklaunch/darklaunch-slide-5.jpg" width="232" alt="darklaunch s5" /></a>
+</p>
+
+> The `.pptx` files themselves are committed at `examples/slides/output/` — open them in PowerPoint and edit directly.
+>
+> `.pptx` 源文件已提交在 `examples/slides/output/`，可直接用 PowerPoint 打开编辑。
+
+---
+
+## ✨ Highlights · 核心亮点
+
+| EN | 中文 |
+| --- | --- |
+| **Editable PPTX** — real `.pptx`, not flattened slide images; verified by `pptx-editable-check.py` | **可编辑 PPTX** —— 输出真实 `.pptx`，非整页图片；由 `pptx-editable-check.py` 验证 |
+| **CJK-first layout** — font fallback, full-width punctuation, conservative sizes; overflow predicted *before* render | **中文排版优先** —— 字体回退、全角符号、保守字号；溢出在渲染前预测 |
+| **Render QA gate** — `render-qa.mjs` catches overflow, overlap, off-canvas, bad image ratios, missing page badges | **渲染 QA 门禁** —— `render-qa.mjs` 捕捉溢出、遮挡、越界、比例错误、缺页码 badge |
+| **Locked recipes** — two locked aesthetic recipes (editorial-grid, dark-launch) so you stop re-deciding every detail | **锁定配方** —— 两套锁定 recipe（editorial-grid、dark-launch），不用每次重新决定 |
+| **Provider-aware AI images** — StepFun (recommended) / MiniMax, CN + global regions, PPT-friendly size presets | **供应商感知 AI 配图** —— StepFun（推荐）/ MiniMax，国内/国际版，PPT 友好尺寸预设 |
+| **WCAG color QA** — sRGB luminance contrast, not eyeballing; CI gate fails on P0 | **WCAG 色彩 QA** —— sRGB 亮度对比，非肉眼；CI 门禁遇 P0 即失败 |
+| **Graceful degradation** — no API key? builds continue with solid-color placeholders, never crash | **优雅降级** —— 没有 API key？纯色占位继续生成，绝不崩溃 |
+
+---
+
+## 🚀 Quick Start · 快速开始
+
+```bash
+git clone https://github.com/CacinieP/ppt-skills.git
+cd ppt-skills
+npm ci          # install locked deps
+npm test        # smoke + preset palette contrast QA
+npm run demos   # build all three demo PPTX (no API key needed)
+```
+
+Then hand a prompt to an Agent with shell access · 然后把下面这段发给有 shell 的 Agent:
+
+```text
+帮我把这份 README 做成可编辑中文 PPTX，约 8 页，editorial-grid 配方。
+/ Make this README into an editable Chinese PPTX, ~8 slides, editorial-grid recipe.
+```
+
+**Or install the skill directly · 或直接安装技能:**
 
 ```bash
 npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 ```
 
-Or hand this prompt to an Agent with shell access:
+---
 
-```text
-Install ppt-skills. Clone https://github.com/CacinieP/ppt-skills into ~/.claude/skills/ppt-skills
-(or your skills dir), then confirm skill.md, lib/, references/, recipes/ exist.
-```
+## 📋 Commands · 命令
 
-Already installed? Update with:
+### Generation · 生成
 
-```text
-Update ppt-skills: cd into the install dir, run git pull, then report the latest commit.
-```
+| Command | Purpose · 作用 |
+| --- | --- |
+| `npm run demo` | 3-slide **Miku** demo (no API key) · 3 页 Miku demo（无需 key） |
+| `npm run demo:editorial` | 6-slide **editorial-grid** recipe demo · 6 页编辑报告风 |
+| `npm run demo:darklaunch` | 5-slide **dark-launch** recipe demo · 5 页发布收尾风 |
+| `npm run demos` | Build all three · 一次构建全部三套 |
 
-Then just say:
+### QA gates · QA 门禁
 
-```text
-Make this README into an editable Chinese PPTX, ~8 slides, Nord theme.
-```
+| Command | Purpose · 作用 |
+| --- | --- |
+| `npm test` | Smoke (imports/provider/size) **+ preset palette contrast QA** · 导入/供应商/尺寸 **+ 预置色板对比度** |
+| `npm run qa:render -- deck.pptx` | **PPTX render + heuristic QA** — overflow, overlap, bounds, image aspect, page badge. P0 exits 1 · 渲染 + 启发式 QA |
+| `npm run qa:render -- deck.pptx --render --out ./qa` | Above **+** drive `soffice → pdf → jpg` when LibreOffice + poppler installed · 额外驱动渲染 |
+| `npm run qa:cjk -- --text "标题" --font-size 44 --box-width 9` | **Render-free CJK overflow estimator**, use before generating · 免渲染 CJK 溢出估算 |
+| `npm run qa:editable -- deck.pptx` | **Editable / CJK-font / macro / theme check** (Python; zip-fallback) · 可编辑性/CJK 字体/宏/主题检查 |
+| `npm run color:qa -- --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body` | WCAG contrast for a palette · 调色板 WCAG 对比 |
+| `npm run color:qa:presets` | All preset palettes (CI gate, exits 1 on P0) · 全部预置色板（CI 门禁） |
 
-More example requests:
+---
 
-```text
-Build a 10-page product-intro PPTX from this outline, dark-launch recipe, with 2 AI cover images.
-Turn this manuscript into an editable deck and run render-qa before delivering.
-Generate a report deck in the editorial-grid recipe; no API key — fall back to hairline cards.
-```
+## 🛠️ Workflows · 工作流
 
-## Suitable / not suitable
+**A. Modify an existing deck · 改已有 PPT** — read the deck / `build_*.js`, scope the change (colors, pages, images, copy, QR, layout), edit + regenerate, then run render QA and fix until clean.
 
-**✅ Suitable** — needs a `.pptx` deliverable / later editing in PowerPoint / stable Chinese typography / QR closing slide / verifiable build (CI gate).
+**B. Generate from manuscript · 从文稿生成** — extract source → decompose into slide-level messages → define theme tokens + image needs → pick reusable layouts → generate AI images, embed, run render QA.
 
-**❌ Not suitable** — only need a browser presentation (use an HTML deck skill) / large animated data dashboards / decks that must never touch PowerPoint.
+---
 
-## Platform support
+## 🎨 AI Image Generation · AI 配图
 
-| Platform | Status | Notes |
-| --- | --- | --- |
-| Claude Code / Codex / ZCode | ✅ supported | native skill workflow; reads `skill.md`, runs build + QA |
-| Cursor / other local Agents | ✅ usable | needs file read/write + shell |
-| CI (GitHub Actions) | ✅ tested | Node 18/20/22 matrix, smoke + color QA + demo builds |
-| Plain chatbot | ⚠️ not recommended | without a file system and shell, stable PPTX + QA is hard |
-
-## Quick Start
-
-Clone the repo, run the smoke test, then copy or reference the skill in your own PPT build workflow.
-
-```bash
-git clone https://github.com/CacinieP/ppt-skills.git
-cd ppt-skills
-npm test
-```
-
-For a new deck build script, copy the helper directory into your working folder:
-
-```text
-skills/themed-cn-pptx/lib/
-```
-
-Then import the provider-aware image helper:
+Use [`skills/themed-cn-pptx/lib/ai-image.js`](skills/themed-cn-pptx/lib/ai-image.js). No key → returns `null`, build falls back to placeholders.
 
 ```js
-import { generateSlideImage } from "./lib/ai-image.js";
-```
-
-If no API key is configured, the helper returns `null` and your build can fall back to solid-color placeholders.
-
-## Commands
-
-### Generation
-
-| Command | Purpose |
-| --- | --- |
-| `npm run demo` | Build the 3-slide Miku demo PPTX (no API key needed) |
-| `npm run demo:editorial` | Build the 6-slide **editorial-grid** recipe demo |
-| `npm run demo:darklaunch` | Build the 5-slide **dark-launch** recipe demo |
-
-### QA gates
-
-| Command | Purpose |
-| --- | --- |
-| `npm test` | Smoke-test imports/provider/region/size + **preset palette contrast QA** |
-| `npm run smoke` | Same as `npm test` minus color QA |
-| `npm run color:qa -- --fg 0F2233 --bg F1FBFA --role body` | Check one foreground/background pair (WCAG) |
-| `npm run color:qa -- --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body` | Check all pairs in a palette |
-| `npm run color:qa -- --json examples/color-qa.sample.json` | Named pairs/palette, P0/P1 summary |
-| `npm run color:qa:presets` | All preset palettes (CI gate, exits 1 on P0) |
-| `npm run qa:render -- deck.pptx` | **PPTX render + heuristic QA** — overflow, overlap, bounds, image aspect, page badge, layout contract. Exits 1 on P0 |
-| `npm run qa:cjk -- --text "标题" --font-size 44 --box-width 9` | **Render-free CJK overflow estimator** before generating |
-| `npm run qa:editable -- deck.pptx` | **Editable-text / CJK-font / macro / theme check** (Python; zip-fallback without python-pptx) |
-
-`qa:render` is the PPTX-route analogue of an HTML layout validator: static checks always run; add `--render --out ./qa` to also drive `soffice → pdf → jpg` when LibreOffice + poppler are on PATH.
-
-## Repository Layout
-
-```text
-ppt-skills/
-  README.md
-  package.json
-  .github/workflows/ci.yml
-  examples/
-    color-qa.sample.json
-    color-qa.presets.json
-    cjk-overflow.sample.json        # sample inputs for the CJK estimator
-    render-qa.sample.json           # example invocations for every QA tool
-    build_miku_demo.mjs
-    build_editorial_demo.mjs        # editorial-grid recipe demo
-    build_darklaunch_demo.mjs       # dark-launch recipe demo
-    slides/output/
-      miku-demo.pptx
-      editorial-demo.pptx
-      darklaunch-demo.pptx
-  scripts/
-    smoke-test.mjs
-    color-qa.mjs
-    color-qa-presets.mjs
-    render-qa.mjs                   # PPTX render + heuristic QA (P0 gate)
-    cjk-overflow-check.mjs          # render-free CJK overflow estimator
-    pptx-editable-check.py          # editable-text / CJK-font / macro check
-  skills/
-    themed-cn-pptx/
-      skill.md
-      references/
-        aesthetic-rules.md
-        image-constraints.md
-        layout-slots.md             # machine-checkable layout contract
-      recipes/
-        recipe-editorial-grid.mjs   # locked recipe: 中文编辑设计风
-        recipe-dark-launch.mjs      # locked recipe: 深底发布风
-        design-contract.md          # editorial-grid contract
-        design-contract-darklaunch.md
-      lib/
-        ai-image.js                 # StepFun / MiniMax provider layer
-        stepfun-image.js            # backward-compat re-export
-        cjk-text.js                 # CJK width calibration (shared by QA tools)
-        pptx-shapes.js              # OOXML slide parser for render-qa
-        zip-reader.js               # dependency-free .pptx zip reader
-```
-
-## Why This Exists
-
-- **Editable PPTX output**: generate real `.pptx` files instead of flattened slide images — verified by `pptx-editable-check.py`.
-- **CJK-aware layout**: handle Chinese font fallback, full-width punctuation, conservative font sizes. `cjk-overflow-check.mjs` predicts wrap/overflow *before* a render.
-- **Render QA gate**: `render-qa.mjs` deterministically catches text overflow, text/shape overlap, off-canvas elements, bad image ratios, and missing page badges — the P0 findings that wreck a generated deck.
-- **Theme recipes**: two locked recipes (editorial-grid, dark-launch) keep palette, typography, repeated marks, and layouts consistent without re-deciding every detail.
-- **Two workflows**: modify an existing deck, or generate a full deck from a manuscript or outline.
-- **Provider-aware AI images**: use StepFun (recommended) or MiniMax, with CN/global regions and PPT-friendly usage presets like `cover`, `card`, `showcase`, and `phoneMockup`.
-- **Graceful degradation**: if no image API key is configured, builds continue and return `null` for generated images.
-
-## What This Adds Compared With Similar Tools
-
-| Source | Useful Pattern | What `ppt-skills` adopts |
-| --- | --- | --- |
-| `guizang-ppt-skill` | locked aesthetic systems, strict image prompting, layout validator | `references/aesthetic-rules.md`, `references/image-constraints.md`, locked **recipes**, and a **PPTX** validator (`render-qa.mjs`) |
-| `slide-editor` | HTML/CSS preview pipeline and fixed canvas thinking | explicit PPT layout contracts and size-safe image slots |
-| `slides-from-anything` | manuscript-to-deck product workflow | two workflows: modify existing PPT or generate from source |
-| This repo | editable PptxGenJS + Chinese QA | CJK typography, QR, render QA, color QA, editable-text check, StepFun/MiniMax provider layer |
-
-## Skills
-
-| Skill | Description | Status |
-| --- | --- | --- |
-| [`themed-cn-pptx`](skills/themed-cn-pptx/) | Build or modify Chinese + IP/character-themed + QR-embeddable editable PPTX decks | Released |
-
-## Workflows
-
-### A. Modify an Existing PPT
-
-Use this path when a user already has a `.pptx` or a `build_*.js` script and wants targeted changes.
-
-1. Read the current deck or build script.
-2. Identify the requested scope: colors, pages, images, copy, QR target, or layout fixes.
-3. Edit `build_<theme>.js` and regenerate the `.pptx`.
-4. Run PDF/JPG render QA and fix visible issues.
-
-### B. Generate PPT from Manuscript
-
-Use this path when a user provides a manuscript, outline, README, product brief, or Notion-style source.
-
-1. Extract the source content.
-2. Decompose it into slide-level messages.
-3. Define the theme tokens and image needs.
-4. Pick a small set of reusable slide layouts.
-5. Generate AI images where useful, embed them into PPTX, then run render QA.
-
-## AI Image Generation
-
-Use [`skills/themed-cn-pptx/lib/ai-image.js`](skills/themed-cn-pptx/lib/ai-image.js) for new builds.
-
-```js
-import {
-  generateSlideImage,
-  addImageToSlide,
-  addImageOverlay,
-  SIZE_MAP,
-} from "./lib/ai-image.js";
+import { generateSlideImage, addImageToSlide, addImageOverlay } from "./lib/ai-image.js";
 
 const cover = await generateSlideImage({
-  provider: "stepfun-cn", // recommended; also supports "stepfun-global", "minimax-cn", "minimax-global"
-  prompt: "中文科技发布会封面背景，青绿色主色，干净高级，留出标题区域",
-  usage: "cover",
+  provider: "stepfun-cn",        // recommended; also: stepfun-global, minimax-cn, minimax-global
+  prompt: "青绿色科技封面背景，干净留白，留出标题区域",
+  usage: "cover",                // -> 1360x768 on StepFun, 16:9 on MiniMax
 });
 
 if (cover) {
   addImageToSlide(slide, cover, { x: 0, y: 0, w: 10, h: 5.625 });
-  addImageOverlay(slide, pres, { color: "0B1B2B", opacity: 45 });
+  addImageOverlay(slide, pres, { color: "0B1B2B", opacity: 45 }); // 40-55% over any image with text
 }
 ```
 
-Existing scripts that import `./lib/stepfun-image.js` still work. That file now re-exports the provider-aware helper for backward compatibility.
+### Provider priority · 供应商优先级
 
-### Provider Selection
+1. `provider` arg to `generateSlideImage()` · 函数参数
+2. `PPT_IMAGE_PROVIDER` / `AI_IMAGE_PROVIDER` env · 环境变量
+3. MiniMax only if `MINIMAX_API_KEY` set and no `STEPFUN_API_KEY` · 仅当 MiniMax key 存在且无 StepFun key
+4. Default: StepFun CN · 默认 StepFun 国内版
 
-Choose a provider per call:
-
-```js
-await generateSlideImage({ provider: "stepfun", prompt, usage: "card" });
-await generateSlideImage({ provider: "minimax", prompt, usage: "card" });
-await generateSlideImage({ provider: "stepfun-global", prompt, usage: "cover" });
-await generateSlideImage({ provider: "minimax-cn", prompt, usage: "showcase" });
-```
-
-Or choose once through environment variables:
+### Environment variables · 环境变量
 
 ```bash
-PPT_IMAGE_PROVIDER=stepfun   # stepfun | minimax
-PPT_IMAGE_REGION=cn          # cn | global
-```
-
-Default behavior:
-
-1. If `provider` is passed to `generateSlideImage()`, it wins.
-2. Else `PPT_IMAGE_PROVIDER` or `AI_IMAGE_PROVIDER` is used.
-3. Else MiniMax is selected only when `MINIMAX_API_KEY` exists and `STEPFUN_API_KEY` does not.
-4. Else StepFun CN is the default and recommended path, preserving older scripts.
-
-### Environment Variables
-
-Create `.env` in your build directory, or export the same variables in your shell or CI.
-
-```bash
-# Recommended default
-PPT_IMAGE_PROVIDER=stepfun        # stepfun | minimax
-PPT_IMAGE_REGION=cn               # cn | global
-
-# StepFun
+PPT_IMAGE_PROVIDER=stepfun       # stepfun | minimax    推荐 stepfun
+PPT_IMAGE_REGION=cn              # cn | global
 STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn                 # cn -> api.stepfun.com, global -> api.stepfun.ai
-STEPFUN_API_MODE=platform         # platform | step_plan
-# STEPFUN_BASE_URL=https://api.stepfun.com/v1  # optional override
-
-# MiniMax
+STEPFUN_REGION=cn                # cn -> api.stepfun.com | global -> api.stepfun.ai
+STEPFUN_API_MODE=platform        # platform | step_plan
 MINIMAX_API_KEY=sk-xxx
-MINIMAX_REGION=global             # cn -> api.minimaxi.com, global -> api.minimax.io
-# MINIMAX_BASE_URL=https://api.minimax.io/v1   # optional override
+MINIMAX_REGION=global            # cn -> api.minimaxi.com | global -> api.minimax.io
 ```
 
-The helper loads `.env` automatically on import. Shell, MCP, or CI environment variables take priority over `.env`.
+The helper auto-loads `.env` on import; shell/CI vars take priority. Create `.env` locally — it's gitignored, never commit keys.
 
-When no key is available for the selected provider, `generateSlideImage()` returns `null` and prints a warning. Your PPTX build should render a solid-color fallback or placeholder instead of failing.
+助手在导入时自动读取 `.env`；shell/CI 变量优先级更高。`.env` 只放本地（已 gitignore），切勿提交。
 
-### Provider Notes
+### Size → layout mapping · 尺寸映射
 
-| Provider | API Shape | Best Fit | Notes |
+| Usage · 用途 | StepFun size | MiniMax ratio | PPTX layout · PPTX 布局 |
 | --- | --- | --- | --- |
-| StepFun | `/images/generations`, concrete `size` like `1360x768` | Precise PPT pixel presets | Recommended default; CN/global domains and Step Plan paths supported |
-| MiniMax | `/image_generation`, `aspect_ratio` like `16:9` | Fast ratio-based deck imagery | CN/global domains supported; URL responses are downloaded immediately |
+| `cover` / `coverOverlay` | `1360x768` | `16:9` | `10 × 5.625 in` |
+| `hero` / `bannerWide` | `1360x768` (+crop) | `16:9` / `21:9` | `10 × 3 in` / `10 × 2.45 in` |
+| `sideStrip` / `phoneMockup` | `768x1360` | `9:16` | `2.5 × 4.44 in` / `1.8 × 3.2 in` |
+| `card` | `1024x1024` | `1:1` | `2.5 × 2.5 in` |
+| `cardWide` / `showcase` | `1184x896` | `4:3` | `3.5 × 2.65 in` / `3.9 × 2.95 in` |
+| `cardTall` | `896x1184` | `3:4` | `2.3 × 3.04 in` |
+| `icon` | `512x512` | `1:1` | `1.5 × 1.5 in` |
 
-### CN / Global Endpoints
+Rules · 规则: use `getImageUsageConfig(usage, provider)` or `SIZE_MAP`; never hand-mix StepFun concrete sizes with MiniMax ratios. StepFun `step-image-edit-2` exposes exact PPT-friendly pixel sizes — that's why it's recommended.
 
-| Provider | Region | Platform | Default Base URL |
-| --- | --- | --- | --- |
-| StepFun | CN | `https://platform.stepfun.com` | `https://api.stepfun.com/v1` |
-| StepFun | Global | `https://platform.stepfun.ai` | `https://api.stepfun.ai/v1` |
-| StepFun Step Plan | CN | `https://platform.stepfun.com` | `https://api.stepfun.com/step_plan/v1` |
-| StepFun Step Plan | Global | `https://platform.stepfun.ai` | `https://api.stepfun.ai/step_plan/v1` |
-| MiniMax | CN | `https://platform.minimaxi.com` | `https://api.minimaxi.com/v1` |
-| MiniMax | Global | `https://platform.minimax.io` | `https://api.minimax.io/v1` |
+### CN / Global endpoints · 国内/国际版端点
 
-MiniMax also supports `promptOptimizer`, `seed`, `n`, and subject references through pass-through parameters:
+| Provider | Region | Default Base URL |
+| --- | --- | --- |
+| StepFun | CN | `https://api.stepfun.com/v1` |
+| StepFun | Global | `https://api.stepfun.ai/v1` |
+| StepFun Step Plan | CN | `https://api.stepfun.com/step_plan/v1` |
+| StepFun Step Plan | Global | `https://api.stepfun.ai/step_plan/v1` |
+| MiniMax | CN | `https://api.minimaxi.com/v1` |
+| MiniMax | Global | `https://api.minimax.io/v1` |
 
-```js
-const img = await generateSlideImage({
-  provider: "minimax",
-  prompt,
-  usage: "showcase",
-  promptOptimizer: true,
-  seed: 42,
-});
-```
+Official docs · 官方文档: [StepFun CN](https://platform.stepfun.com/docs/zh/api-reference/images/image) · [StepFun Global](https://platform.stepfun.ai/docs/en/api-reference/images/image) · [StepFun Step Plan](https://platform.stepfun.com/docs/zh/step-plan/integrations/image-api) · [MiniMax CN](https://platform.minimaxi.com/docs/api-reference/image-generation-i2i)
 
-StepFun supports `steps`, `cfgScale`, `negativePrompt`, `textMode`, `seed`, and `apiMode`:
+---
 
-```js
-const img = await generateSlideImage({
-  provider: "stepfun-cn",
-  prompt,
-  usage: "cover",
-  steps: 8,
-  cfgScale: 1.0,
-  textMode: true,
-});
-```
+## 🧪 QA Expectations · QA 预期
 
-## Open Platform Guide
-
-StepFun is the recommended provider for this skill because its `step-image-edit-2` model exposes exact PPT-friendly pixel sizes such as `1360x768`, `1184x896`, and `768x1360`.
-
-1. Choose region: use StepFun CN (`platform.stepfun.com`) for China accounts, or StepFun Global (`platform.stepfun.ai`) for international accounts.
-2. Register or sign in, then open the API key page / user center.
-3. Create an API key. Keep it local; never commit it.
-4. For normal Open Platform image generation, set `STEPFUN_API_MODE=platform`. If you subscribed to Step Plan and need the dedicated path, set `STEPFUN_API_MODE=step_plan`.
-5. Put the key and region in `.env`:
-
-```bash
-PPT_IMAGE_PROVIDER=stepfun
-PPT_IMAGE_REGION=cn
-STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn
-STEPFUN_API_MODE=platform
-```
-
-6. Run a no-key/config smoke test:
-
-```bash
-npm test
-```
-
-7. In a deck build script, call `generateSlideImage({ provider: "stepfun-cn", usage: "cover", prompt })`. If your account is global, switch to `provider: "stepfun-global"` or set `STEPFUN_REGION=global`.
-
-Official references:
-
-- StepFun CN image API: https://platform.stepfun.com/docs/zh/api-reference/images/image
-- StepFun Global image API: https://platform.stepfun.ai/docs/en/api-reference/images/image
-- StepFun Step Plan image integration: https://platform.stepfun.com/docs/zh/step-plan/integrations/image-api
-- MiniMax CN image API: https://platform.minimaxi.com/docs/api-reference/image-generation-i2i
-- MiniMax CN/global base URL note: https://platform.minimax.io/docs/token-plan/cursor
-
-### Size-to-Layout Mapping
-
-| Usage | PPT Role | StepFun Size | MiniMax Ratio | PPTX Layout |
-| --- | --- | --- | --- | --- |
-| `cover` | Full-bleed cover background | `1360x768` | `16:9` | `10 x 5.625 in` |
-| `coverOverlay` | Cover background with text overlay | `1360x768` | `16:9` | `10 x 5.625 in` |
-| `hero` | Top banner | `1360x768` | `16:9` | `10 x 3 in` |
-| `bannerWide` | Ultra-wide banner | `1360x768` + crop | `21:9` | `10 x 2.45 in` |
-| `ultraWideHero` | Ultra-wide title visual | `1360x768` + crop | `21:9` | `10 x 2.8 in` |
-| `sideStrip` | Vertical side decoration | `768x1360` | `9:16` | `2.5 x 4.44 in` |
-| `card` | Square card image | `1024x1024` | `1:1` | `2.5 x 2.5 in` |
-| `cardTall` | Tall card image | `896x1184` | `3:4` | `2.3 x 3.04 in` |
-| `cardWide` | Wide card image | `1184x896` | `4:3` | `3.5 x 2.65 in` |
-| `showcase` | Product/project panel | `1184x896` | `4:3` | `3.9 x 2.95 in` |
-| `phoneMockup` | Mobile mockup | `768x1360` | `9:16` | `1.8 x 3.2 in` |
-| `icon` | Small icon or avatar | `512x512` | `1:1` | `1.5 x 1.5 in` |
-
-Image adaptation rules:
-
-- StepFun `step-image-edit-2` uses official `size` strings. Keep the PPT usage mapping fixed: `cover/hero -> 1360x768`, `showcase/cardWide -> 1184x896`, `phoneMockup/sideStrip -> 768x1360`.
-- `bannerWide` and `ultraWideHero`: MiniMax uses native `21:9`; StepFun uses `1360x768` and relies on the returned `cropPolicy`/`safeZone` metadata for PPT placement.
-- StepFun text-to-image is treated as one image per request; call repeatedly for multiple candidates.
-- MiniMax should normally use `aspect_ratio`; only pass `width/height` for custom sizes, and keep both in `[512, 2048]` and divisible by 8.
-- Use `getImageUsageConfig(usage, provider)` or `SIZE_MAP`; do not hand-mix StepFun concrete sizes with MiniMax ratios.
-
-Generated image metadata includes:
-
-```js
-{
-  provider,
-  region,
-  localPath,
-  absolutePath,
-  size,
-  aspectRatio,
-  cropPolicy,
-  safeZone,
-  model,
-  seed,
-  usage,
-  pptxLayout
-}
-```
-
-## Color QA
-
-Use sRGB relative luminance, not raw RGB distance, to judge text/background safety. The helper follows the WCAG contrast formula:
-
-```bash
-node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body
-node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
-node scripts/color-qa.mjs --json examples/color-qa.sample.json
-```
-
-Rules:
-
-- Body text must be at least `4.5:1`.
-- Large titles, UI borders, icons, and graphical objects must be at least `3:1`.
-- Do not use saturated accent colors as body text on light backgrounds.
-- Do not rely on red/green alone for status.
-- Avoid saturated blue on orange/red, two saturated colors as foreground/background, gray-on-gray, and text directly over busy AI images without a 40-55% overlay.
-
-## QA Expectations
-
-After generating or modifying a deck, render and inspect it:
+Before delivering a real deck, render and inspect · 真实交付前先渲染检查:
 
 ```bash
 soffice --headless --convert-to pdf deck.pptx
 pdftoppm -jpeg -r 100 deck.pdf slide
 ```
 
-Check for CJK overflow, cropped full-width punctuation, unreadable text on images, QR contrast, footer collisions, and AI image aspect mismatches. Fix and re-render until the slide images are clean.
+Watch for · 重点检查: CJK overflow, cropped full-width punctuation, unreadable text on images, QR contrast, footer collisions, AI image aspect mismatches. `render-qa.mjs` automates the deterministic checks.
 
-## Development Smoke Test
+### Color QA rules · 色彩 QA 规则
 
-The smoke test verifies imports, provider resolution, size mapping, model listing, and no-key fallback without calling real image APIs.
+- Body text / URLs / footnotes: **≥ 4.5:1** · 正文/URL/脚注
+- Large titles / icons / borders / UI: **≥ 3:1** · 大标题/图标/边框/UI
+- Never use a saturated accent as body text · 不用高饱和副色当正文
+- Never rely on red/green alone for status · 不只靠红/绿表达状态
+- Text over AI images needs a 40–55% overlay · AI 图上文字需 40–55% 遮罩
 
-```bash
-node scripts/smoke-test.mjs
+---
+
+## 🧭 Where this sits vs. `guizang-ppt-skill` · 与 guizang-ppt-skill 的关系
+
+`guizang-ppt-skill` is a mature **single-file HTML horizontal-slide deck** skill — browser-first, strong aesthetic templates. This repo is a **different route, not a competitor**.
+
+| Dimension · 维度 | `guizang-ppt-skill` | `ppt-skills` (this repo · 本仓库) |
+| --- | --- | --- |
+| **Output · 输出物** | single-file HTML, browser | real editable `.pptx`, PowerPoint |
+| **Best for · 适合** | offline talks, demo days, personal keynotes | decks delivered as `.pptx`, edited later, stable Chinese type |
+| **Aesthetic system · 审美系统** | two fixed templates (magazine, Swiss) | two locked recipes + extensible theme system |
+| **QA approach · QA 方式** | HTML layout validator (`data-layout`) | PPTX render + heuristic QA, CJK overflow, editable-text, color contrast |
+| **Image · 配图** | Codex/GPT-Image into HTML | provider layer (StepFun/MiniMax) returning PPTX layout metadata |
+
+**Two routes, complementary · 两条路线，互补.** Browser talks → HTML; deliverable `.pptx` → this repo.
+
+---
+
+## 📦 Platform Support · 平台支持
+
+| Platform · 平台 | Status | Notes · 说明 |
+| --- | --- | --- |
+| Claude Code / Codex / ZCode | ✅ supported | native skill workflow |
+| Cursor / local Agents | ✅ usable | needs file read/write + shell |
+| CI (GitHub Actions) | ✅ tested | Node 20/22 matrix, npm ci, smoke + color QA + demo builds + render QA |
+| Plain chatbot | ⚠️ not recommended | without a filesystem + shell, stable PPTX + QA is hard |
+
+---
+
+## 📁 Repository Layout · 仓库结构
+
+```text
+ppt-skills/
+  README.md            docs/                 # rendered demo images (committed)
+  package.json         design-principles.md
+  .github/workflows/ci.yml
+  examples/
+    build_miku_demo.mjs  build_editorial_demo.mjs  build_darklaunch_demo.mjs
+    color-qa.sample.json  color-qa.presets.json  cjk-overflow.sample.json  render-qa.sample.json
+    slides/output/        # the committed .pptx demos — open & edit in PowerPoint
+      miku-demo.pptx  editorial-demo.pptx  darklaunch-demo.pptx
+  scripts/
+    smoke-test.mjs  color-qa.mjs  color-qa-presets.mjs
+    render-qa.mjs   cjk-overflow-check.mjs   pptx-editable-check.py
+  skills/themed-cn-pptx/
+    skill.md
+    references/   aesthetic-rules.md  image-constraints.md  layout-slots.md
+    recipes/      recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
+    lib/          ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
 ```
 
-## IP and Character Theme Note
+---
 
-For character/IP-themed decks, prefer color systems, abstract visual motifs, and user-provided licensed assets. Do not imply official endorsement, and do not generate trademarked character art unless the user has rights or explicitly asks for a legally safe, inspired-by visual direction.
+## 🤝 Suitable / not suitable · 适合 / 不适合
 
-## Contribute
+**✅ Suitable · 适合** — needs a `.pptx` deliverable / later editing in PowerPoint / stable Chinese typography / QR closing slide / verifiable CI-gated build.
 
-Got a PPT skill recipe? Submit a PR:
+**❌ Not suitable · 不适合** — only need a browser presentation (use an HTML deck skill) / large animated data dashboards / decks that must never touch PowerPoint.
+
+## 🖋️ IP & Character Theme Note · 版权与 IP 提醒
+
+For character/IP-themed decks, prefer color systems, abstract visual motifs, and user-provided licensed assets. Do not imply official endorsement; do not generate trademarked character art unless the user has rights or explicitly asks for a legally-safe, inspired-by direction.
+
+角色/IP 主题优先使用色彩系统、抽象符号和用户授权素材。不要默认生成官方角色图，也不要暗示官方背书。
+
+## 🤝 Contribute · 贡献
+
+Got a PPT skill recipe? Submit a PR under:
 
 ```text
 skills/<skill-name>/skill.md
@@ -462,290 +305,6 @@ skills/<skill-name>/lib/          # optional utility code
 skills/<skill-name>/examples/     # optional build scripts
 ```
 
-## License
+## License · 许可
 
-MIT
-
----
-
-# PPT 技能合集
-
-[![License](https://img.shields.io/github/license/CacinieP/ppt-skills?style=flat-square)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/CacinieP/ppt-skills/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/CacinieP/ppt-skills/actions/workflows/ci.yml)
-[![Skills](https://img.shields.io/badge/skills-1%20released-39c5bb?style=flat-square)](skills/)
-[![PPTX](https://img.shields.io/badge/output-editable%20.pptx-0A7CFF?style=flat-square)](#为什么是这个仓库)
-
-用 PptxGenJS 生成并**验收**真实、**可编辑、适配中文排版的 PPTX** 的开源技能合集。这个仓库押的是「PowerPoint 可交付的 `.pptx`」(不是浏览器 deck)、中文排版稳定性，以及一道确定性 QA 门禁——让 Agent 生成的 deck 在交付前被验证，而不是靠肉眼。
-
-首个技能 [`themed-cn-pptx`](skills/themed-cn-pptx/) 内置两套**锁定审美 recipe**(editorial-grid、dark-launch)、provider 感知的 AI 配图层(StepFun / MiniMax)，以及三个 QA 工具(渲染 QA、CJK 溢出、可编辑性检查)。
-
-## 和 `guizang-ppt-skill` 的关系
-
-`guizang-ppt-skill` 是成熟的**单文件 HTML 横向翻页 deck** 技能——浏览器优先、强审美模板。本仓库走的是另一条路线，不是竞品:
-
-| 维度 | `guizang-ppt-skill` | `ppt-skills`(本仓库) |
-| --- | --- | --- |
-| **输出物** | 单文件 HTML，浏览器打开 | 真实可编辑 `.pptx`，PowerPoint 打开 |
-| **适合** | 线下分享、demo day、个人风格演讲 | 需交付 .pptx、后续可编辑、中文排版稳定的 deck |
-| **不适合** | 大段表格、培训课件、多人协作 | 只要浏览器演示、HTML 动画转场 |
-| **审美系统** | 两套固定模板(杂志风、瑞士风) | 两套锁定 recipe + 可扩展主题系统 |
-| **QA 方式** | HTML 版式校验器(`data-layout`) | PPTX 渲染 + 启发式 QA、CJK 溢出、可编辑性、色彩对比 |
-| **配图** | Codex/GPT-Image 工作流入 HTML | provider 层(StepFun/MiniMax)返回 PPTX layout 元数据 |
-
-**两条路线，互补。** 浏览器演讲选 HTML；交付物必须是 `.pptx` 选本仓库。
-
-## 30 秒开始
-
-```bash
-npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
-```
-
-或把下面这段话发给有 shell 权限的 AI Agent:
-
-```text
-帮我安装 ppt-skills。把 https://github.com/CacinieP/ppt-skills 克隆到 ~/.claude/skills/ppt-skills
-(或你的 skills 目录),然后确认 skill.md、lib/、references/、recipes/ 都存在。
-```
-
-已安装过?用这段话更新:
-
-```text
-帮我更新 ppt-skills:进入安装目录执行 git pull,然后告诉我最新 commit。
-```
-
-然后直接说:
-
-```text
-帮我把这份 README 做成可编辑中文 PPTX,约 8 页,Nord 主题。
-```
-
-## 快速开始
-
-```bash
-git clone https://github.com/CacinieP/ppt-skills.git
-cd ppt-skills
-npm test
-```
-
-在自己的 PPT 构建目录中复制或引用:
-
-```text
-skills/themed-cn-pptx/lib/
-```
-
-新脚本导入：
-
-```js
-import { generateSlideImage } from "./lib/ai-image.js";
-```
-
-没有 API key 时，生图函数返回 `null`，构建脚本应继续用纯色块或占位图生成 PPTX。
-
-## 常用命令
-
-### 生成
-
-| 命令 | 作用 |
-| --- | --- |
-| `npm run demo` | 生成 3 页 Miku demo PPTX(无需 API key) |
-| `npm run demo:editorial` | 生成 6 页 **editorial-grid** recipe demo |
-| `npm run demo:darklaunch` | 生成 5 页 **dark-launch** recipe demo |
-
-### QA 门禁
-
-| 命令 | 作用 |
-| --- | --- |
-| `npm test` | 检查 ESM 导入、provider/region 别名、尺寸映射、无 key 降级 **+ 预置色板对比度 QA** |
-| `npm run smoke` | 同 `npm test`(不含色板 QA) |
-| `npm run color:qa -- --fg 0F2233 --bg F1FBFA --role body` | 检查一组前景/背景色(WCAG) |
-| `npm run color:qa -- --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body` | 检查调色板两两组合 |
-| `npm run color:qa -- --json examples/color-qa.sample.json` | 检查命名色彩组合并输出 P0/P1 汇总 |
-| `npm run color:qa:presets` | 检查全部预置色板(CI 门禁,P0 即退出码 1) |
-| `npm run qa:render -- deck.pptx` | **PPTX 渲染 + 启发式 QA**——溢出、遮挡、越界、图文比例、页码 badge、版式契约。P0 即退出码 1 |
-| `npm run qa:cjk -- --text "标题" --font-size 44 --box-width 9` | **免渲染 CJK 溢出估算**,生成前先用 |
-| `npm run qa:editable -- deck.pptx` | **可编辑性 / CJK 字体 / 宏 / 主题检查**(Python;无 python-pptx 时 zip 回退) |
-
-`qa:render` 是 HTML 版式校验器的 PPTX 路线对应物:静态检查总会跑;加 `--render --out ./qa` 可在装了 LibreOffice + poppler 时额外驱动 `soffice → pdf → jpg`。
-
-## 核心能力
-
-- **可编辑 PPTX**:输出真实 `.pptx`,不是整页图片——由 `pptx-editable-check.py` 验证。
-- **中文排版优先**:处理 CJK 字体、全角符号、字号、换行。`cjk-overflow-check.mjs` 能在渲染前就预测换行/溢出。
-- **渲染 QA 门禁**:`render-qa.mjs` 确定性地捕捉文本溢出、文字/图形遮挡、越界元素、图片比例错误、缺页码 badge——这些 P0 问题会毁掉一个生成出来的 deck。
-- **主题配方**:两套锁定 recipe(editorial-grid、dark-launch)锁死色板、字号阶、重复装饰和版式,不用每次重新决定。
-- **双工作流**:既能改已有 PPT,也能从文稿/大纲生成完整 PPT。
-- **双生图供应商**:统一支持 StepFun(重点推荐)和 MiniMax,覆盖国内版/国际版,按 `cover`、`card`、`showcase` 等用途自动匹配比例。
-- **优雅降级**:没配置 API key 时返回 `null`,PPT 构建不崩。
-
-## 快速生图用法
-
-新脚本推荐导入：
-
-```js
-import { generateSlideImage, addImageToSlide, addImageOverlay } from "./lib/ai-image.js";
-
-const img = await generateSlideImage({
-  provider: "stepfun-cn", // 推荐；也支持 stepfun-global / minimax-cn / minimax-global
-  prompt: "青绿色科技主题封面背景，干净，留白，适合中文标题",
-  usage: "cover",
-});
-
-if (img) {
-  addImageToSlide(slide, img);
-}
-```
-
-旧脚本继续导入 `./lib/stepfun-image.js` 也能运行，它现在只是兼容入口。
-
-## 环境变量
-
-```bash
-PPT_IMAGE_PROVIDER=stepfun       # 推荐：stepfun；也可用 minimax
-PPT_IMAGE_REGION=cn              # cn | global
-
-STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn                # cn -> api.stepfun.com；global -> api.stepfun.ai
-STEPFUN_API_MODE=platform        # platform | step_plan
-# STEPFUN_BASE_URL=https://api.stepfun.com/v1  # 可选强制覆盖
-
-MINIMAX_API_KEY=sk-xxx
-MINIMAX_REGION=global            # cn -> api.minimaxi.com；global -> api.minimax.io
-# MINIMAX_BASE_URL=https://api.minimax.io/v1   # 可选强制覆盖
-```
-
-优先级：函数参数 `provider` > `PPT_IMAGE_PROVIDER` / `AI_IMAGE_PROVIDER` > 自动判断 > StepFun 国内版默认。
-
-如果没有对应 key，`generateSlideImage()` 会返回 `null` 并打印提示。构建脚本应该用纯色块或占位图继续生成 PPTX。
-
-## 国内版 / 国际版
-
-| 供应商 | 版本 | 平台入口 | 默认 Base URL |
-| --- | --- | --- | --- |
-| StepFun | 国内版 | `https://platform.stepfun.com` | `https://api.stepfun.com/v1` |
-| StepFun | 国际版 | `https://platform.stepfun.ai` | `https://api.stepfun.ai/v1` |
-| StepFun Step Plan | 国内版 | `https://platform.stepfun.com` | `https://api.stepfun.com/step_plan/v1` |
-| StepFun Step Plan | 国际版 | `https://platform.stepfun.ai` | `https://api.stepfun.ai/step_plan/v1` |
-| MiniMax | 国内版 | `https://platform.minimaxi.com` | `https://api.minimaxi.com/v1` |
-| MiniMax | 国际版 | `https://platform.minimax.io` | `https://api.minimax.io/v1` |
-
-可直接用别名指定：
-
-```js
-await generateSlideImage({ provider: "stepfun-cn", prompt, usage: "cover" });
-await generateSlideImage({ provider: "stepfun-global", prompt, usage: "cover" });
-await generateSlideImage({ provider: "minimax-cn", prompt, usage: "card" });
-await generateSlideImage({ provider: "minimax-global", prompt, usage: "card" });
-```
-
-## 开放平台申请和使用指南
-
-**优先推荐 StepFun**：`step-image-edit-2` 支持 `1360x768`、`1184x896`、`768x1360` 等 PPT 友好的精确尺寸，封面、展示图、竖向侧栏都更容易不裁切。
-
-1. 选择版本：国内账号用 `platform.stepfun.com`，国际账号用 `platform.stepfun.ai`。
-2. 注册/登录后进入用户中心或 API Key 页面。
-3. 创建 API Key，并只放在本地 `.env` 或 CI 密钥里，不要提交到 Git。
-4. 普通开放平台调用使用 `STEPFUN_API_MODE=platform`；如果你订阅的是 Step Plan 并需要专属路径，使用 `STEPFUN_API_MODE=step_plan`。
-5. 在构建目录写入 `.env`：
-
-```bash
-PPT_IMAGE_PROVIDER=stepfun
-PPT_IMAGE_REGION=cn
-STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn
-STEPFUN_API_MODE=platform
-```
-
-6. 先跑配置 smoke test：
-
-```bash
-npm test
-```
-
-7. 在 PPT 构建脚本中调用：
-
-```js
-const cover = await generateSlideImage({
-  provider: "stepfun-cn",
-  prompt: "适合中文标题的青绿色科技封面背景，干净留白",
-  usage: "cover",
-  steps: 8,
-  cfgScale: 1.0,
-  textMode: true,
-});
-```
-
-国际版账号把 `provider` 改为 `stepfun-global`，或设置 `STEPFUN_REGION=global`。
-
-官方参考：
-
-- StepFun 国内图片 API：https://platform.stepfun.com/docs/zh/api-reference/images/image
-- StepFun 国际图片 API：https://platform.stepfun.ai/docs/en/api-reference/images/image
-- StepFun Step Plan 图片接入：https://platform.stepfun.com/docs/zh/step-plan/integrations/image-api
-- MiniMax 国内图片 API：https://platform.minimaxi.com/docs/api-reference/image-generation-i2i
-- MiniMax 国内/国际 Base URL 说明：https://platform.minimax.io/docs/token-plan/cursor
-
-## 尺寸映射
-
-| 用途 | PPT 场景 | StepFun 尺寸 | MiniMax 比例 | PPTX 布局 |
-| --- | --- | --- | --- | --- |
-| `cover` | 全幅封面背景 | `1360x768` | `16:9` | `10 x 5.625 in` |
-| `hero` | 顶部横幅 | `1360x768` | `16:9` | `10 x 3 in` |
-| `bannerWide` | 超宽横幅 | `1360x768` + 裁切 | `21:9` | `10 x 2.45 in` |
-| `ultraWideHero` | 超宽首页/章节视觉 | `1360x768` + 裁切 | `21:9` | `10 x 2.8 in` |
-| `sideStrip` | 竖向侧栏 | `768x1360` | `9:16` | `2.5 x 4.44 in` |
-| `card` | 方形卡片图 | `1024x1024` | `1:1` | `2.5 x 2.5 in` |
-| `cardTall` | 竖版卡片图 | `896x1184` | `3:4` | `2.3 x 3.04 in` |
-| `cardWide` | 横版卡片图 | `1184x896` | `4:3` | `3.5 x 2.65 in` |
-| `showcase` | 产品/项目展示 | `1184x896` | `4:3` | `3.9 x 2.95 in` |
-| `phoneMockup` | 手机竖屏 | `768x1360` | `9:16` | `1.8 x 3.2 in` |
-| `icon` | 小图标/头像 | `512x512` | `1:1` | `1.5 x 1.5 in` |
-
-图片尺寸适配规则：
-
-- StepFun `step-image-edit-2` 使用官方 `size` 字符串；PPT 用途固定映射：`cover/hero -> 1360x768`，`showcase/cardWide -> 1184x896`，`phoneMockup/sideStrip -> 768x1360`。
-- `bannerWide` / `ultraWideHero`：MiniMax 原生 `21:9`；StepFun 用 `1360x768` 生成，再按返回的 `cropPolicy` / `safeZone` 元数据放入 PPT。
-- StepFun 文生图按单次 1 张处理；需要多张候选图时循环调用。
-- MiniMax 默认用 `aspect_ratio`；只有自定义尺寸时才传 `width/height`，并保证 512-2048 且可被 8 整除。
-- 用 `getImageUsageConfig(usage, provider)` 或 `SIZE_MAP` 取配置，不手写混用 StepFun 尺寸和 MiniMax 比例。
-
-## 色彩 QA
-
-色彩 QA 按 sRGB 相对亮度算，不按 RGB 数值差或肉眼感觉判断。脚本实现了 WCAG 对比度公式：
-
-```bash
-node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body
-node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
-node scripts/color-qa.mjs --json examples/color-qa.sample.json
-```
-
-规则：
-
-- 正文、小字号中文、URL、脚注至少 `4.5:1`。
-- 大标题、图标、边框、图例、UI 组件至少 `3:1`。
-- 不用高饱和副色当正文。
-- 不只靠红/绿表达状态。
-- 避免蓝字压橙红底、两个高饱和色互为文字/背景、浅灰压浅底、深灰压深底。
-- AI 图上放文字必须加 40-55% 遮罩或文字底板。
-
-## 验证
-
-```bash
-node scripts/smoke-test.mjs
-```
-
-真实 PPT 交付前仍要做 PDF/JPG 渲染检查：
-
-```bash
-soffice --headless --convert-to pdf deck.pptx
-pdftoppm -jpeg -r 100 deck.pdf slide
-```
-
-重点检查：中文溢出、全角符号挤压、图片上文字可读性、二维码对比度、页脚压内容、AI 配图比例是否匹配。
-
-## 版权与 IP 提醒
-
-角色/IP 主题优先使用色彩系统、抽象符号和用户授权素材。不要默认生成官方角色图，也不要暗示官方背书；需要时用 legally safe 的 inspired-by 视觉方向。
-
-## 许可
-
-MIT
+[MIT](LICENSE)
