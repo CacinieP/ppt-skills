@@ -32,3 +32,9 @@ Desktop.ini
 # IDE
 .vscode/
 .idea/
+
+# Next.js build output (web/)
+web/.next/
+web/out/
+web/next-env.d.ts
+web/**/*.tsbuildinfo

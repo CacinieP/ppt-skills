@@ -1,0 +1,10 @@
+# Local env (also covered by root, kept for standalone use)
+.env
+.env.local
+.env.*.local
+
+# Build output
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo

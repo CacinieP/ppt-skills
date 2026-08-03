@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/*
+ * PPT-Web — "Platinum White-Gold" dark engineering theme.
+ * Echoes the design language from the pptx-generator skill:
+ *   gray-1000 #0a0a0a (canvas), gold-400 #D4AF37 (accent),
+ *   blue-400 #0070F3 (secondary accent), platinum whites.
+ */
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #121214;
+  --bg-elev-2: #18181b;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --text: #f5f5f5;
+  --text-dim: #a1a1aa;
+  --text-mute: #71717a;
+  --gold: #d4af37;
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --blue: #0070f3;
+  --blue-soft: rgba(0, 112, 243, 0.12);
+}
+
+@theme inline {
+  --color-canvas: var(--bg);
+  --color-elev: var(--bg-elev);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-ink-dim: var(--text-dim);
+  --color-ink-mute: var(--text-mute);
+  --color-gold: var(--gold);
+  --color-azure: var(--blue);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin gold focus ring for inputs/labels. */
+input,
+textarea,
+select,
+button {
+  outline: none;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+/* Custom scrollbar — dark + subtle gold. */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+/* Mono label utility — engineering feel. */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
