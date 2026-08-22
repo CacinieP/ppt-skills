@@ -72,7 +72,7 @@ jobs:
           python3 scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
 
       - name: Upload demo PPTX artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: demos-node-${{ matrix.node-version }}
           path: |
@@ -132,7 +132,7 @@ jobs:
         run: node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --render --out qa-editorial
 
       - name: Upload rendered slide JPGs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: qa-jpgs-editorial
           path: qa-editorial/*.jpg
