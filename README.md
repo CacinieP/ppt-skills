@@ -267,7 +267,7 @@ ppt-skills/
     smoke-test.mjs  color-qa.mjs  color-qa-presets.mjs
     render-qa.mjs   cjk-overflow-check.mjs   pptx-editable-check.py
   skills/themed-cn-pptx/
-    skill.md
+    SKILL.md
     references/   aesthetic-rules.md  image-constraints.md  layout-slots.md
     recipes/      recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
     lib/          ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
@@ -290,7 +290,7 @@ For character/IP-themed decks, prefer color systems, abstract visual motifs, and
 Got a PPT skill recipe? Submit a PR under:
 
 ```text
-skills/<skill-name>/skill.md
+skills/<skill-name>/SKILL.md
 skills/<skill-name>/lib/          # optional utility code
 skills/<skill-name>/examples/     # optional build scripts
 ```

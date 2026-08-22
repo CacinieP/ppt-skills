@@ -35,6 +35,11 @@ jobs:
       - name: Install dependencies (locked)
         run: npm ci
 
+      # Pin python-pptx so editable-text and CJK-font checks cannot silently
+      # degrade to the zip-only fallback on runner-image changes.
+      - name: Install Python QA dependency
+        run: python3 -m pip install --disable-pip-version-check --no-input python-pptx==1.0.2
+
       - name: Validate skill manifests
         run: node scripts/validate-skills.mjs
 
@@ -58,10 +63,8 @@ jobs:
           node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx
           node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx
 
-      # Editable-text / CJK-font / macro / theme check.
-      # Python + python-pptx are preinstalled on ubuntu-latest; if a future
-      # runner lacks python-pptx, the script degrades to a zip-only pass and
-      # warns instead of failing.
+      # Editable-text / CJK-font / macro / theme check. python-pptx is
+      # installed above, so the deep checks run instead of the zip fallback.
       - name: pptx-editable-check on demo decks
         run: |
           python3 scripts/pptx-editable-check.py examples/slides/output/miku-demo.pptx
@@ -79,10 +82,30 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # Exercise the same installer path users invoke. A temporary Git project
+  # keeps the smoke test isolated from both the workspace and global skills.
+  skill-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install themed-cn-pptx through the skills CLI
+        run: |
+          install_root="$(mktemp -d)"
+          git -C "$install_root" init -q --initial-branch=main
+          cd "$install_root"
+          npx --yes skills@1.5.23 add "$GITHUB_WORKSPACE" --skill themed-cn-pptx --agent codex --copy -y
+          test -f .agents/skills/themed-cn-pptx/SKILL.md
+
   # Heavy render verification runs once (Node 22 only), after the fast gates
   # pass. Installing LibreOffice + poppler on a single node keeps the run fast.
   render:
-    needs: test
+    needs: [test, skill-install]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

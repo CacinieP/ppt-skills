@@ -4,7 +4,7 @@
  * cjk-overflow-check.mjs
  *
  * Render-free estimator: will this Chinese / mixed text overflow its PPTX box?
- * Turns the CJK rules scattered across skill.md §3 and §7 into an executable
+ * Turns the CJK rules scattered across SKILL.md §3 and §7 into an executable
  * check you can run BEFORE generating a slide, so you never wait for a
  * LibreOffice render just to discover a title wrapped to a third line.
  *

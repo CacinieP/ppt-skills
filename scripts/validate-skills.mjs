@@ -16,7 +16,12 @@ async function findSkillManifests(dir) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
       manifests.push(...(await findSkillManifests(path)));
-    } else if (entry.isFile() && entry.name === "SKILL.md") {
+    } else if (entry.isFile() && entry.name.toLowerCase() === "skill.md") {
+      if (entry.name !== "SKILL.md") {
+        throw new Error(
+          `${relative(rootDir, path)}: manifest must be named exactly SKILL.md`,
+        );
+      }
       manifests.push(path);
     }
   }

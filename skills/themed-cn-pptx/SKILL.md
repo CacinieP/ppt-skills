@@ -788,7 +788,7 @@ pdftoppm -jpeg -r 100 -f N -l N deck.pdf slide-fix
 
 ```
 skills/themed-cn-pptx/
-  skill.md                     # 本文档
+  SKILL.md                     # 本文档
   references/
     aesthetic-rules.md         # 视觉系统与美学负面清单
     image-constraints.md       # 生图 manifest、尺寸、负面 prompt

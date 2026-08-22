@@ -1,6 +1,6 @@
 # Layout Slot Contracts
 
-This reference turns the `Slide 类型菜单` in `skill.md §5` from prose into a
+This reference turns the `Slide 类型菜单` in `SKILL.md §5` from prose into a
 **machine-checkable contract**. Each layout declares which slots it requires
 and which image usages it allows. `scripts/render-qa.mjs --contract <this-file>`
 reads the fenced `contract` blocks and verifies a generated `.pptx` against
@@ -20,7 +20,7 @@ Each layout has one fenced block tagged `contract`:
 { "layout": "Cover", "requiredSlots": ["stripe", "title"], "forbiddenUsages": ["card"] }
 ```
 
-- `layout` — the layout family name (matches skill.md §5).
+- `layout` — the layout family name (matches SKILL.md §5).
 - `requiredSlots` — slots that MUST be present on every slide using this layout.
   Recognized slots today: `stripe` (thin full-width shape near top or bottom),
   `title` (any text run ≥ 24pt), `footer` (small text in the bottom band),

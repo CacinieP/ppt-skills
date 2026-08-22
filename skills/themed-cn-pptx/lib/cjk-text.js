@@ -4,7 +4,7 @@
  * PptxGenJS does not measure rendered text, so a long Chinese title that fits
  * on a 9" box at 44pt in the author's head can wrap to a third line in the
  * actual render and collide with a subtitle. This module turns the heuristics
- * already written in skill.md §3 and §7 into executable, render-free math.
+ * already written in SKILL.md §3 and §7 into executable, render-free math.
  *
  * Calibration used across this skill:
  *   - CJK ideograph advance width ≈ fontSize × 0.95pt  (full-width blocks)
@@ -106,7 +106,7 @@ export function fitsBox(text, opts) {
 
 /**
  * Recommend the largest standard font size (pt) that keeps text on one line
- * inside the box. Standard ladder mirrors skill.md §3 CJK table.
+ * inside the box. Standard ladder mirrors SKILL.md §3 CJK table.
  *
  * @returns {number|null} recommended pt, or null if text cannot fit at the
  *   smallest rung even with a very small size (text far too long for the box).

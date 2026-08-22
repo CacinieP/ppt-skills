@@ -267,7 +267,7 @@ ppt-skills/
     smoke-test.mjs  color-qa.mjs  color-qa-presets.mjs
     render-qa.mjs   cjk-overflow-check.mjs   pptx-editable-check.py
   skills/themed-cn-pptx/
-    skill.md
+    SKILL.md
     references/   aesthetic-rules.md  image-constraints.md  layout-slots.md
     recipes/      recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
     lib/          ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
@@ -290,7 +290,7 @@ ppt-skills/
 有 PPT 技能 recipe？在下面目录提 PR：
 
 ```text
-skills/<skill-name>/skill.md
+skills/<skill-name>/SKILL.md
 skills/<skill-name>/lib/          # 可选工具代码
 skills/<skill-name>/examples/     # 可选构建脚本
 ```
