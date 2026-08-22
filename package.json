@@ -22,10 +22,11 @@
     "qa"
   ],
   "scripts": {
+    "skill:validate": "node scripts/validate-skills.mjs",
     "color:qa": "node scripts/color-qa.mjs",
     "color:qa:presets": "node scripts/color-qa-presets.mjs",
     "smoke": "node scripts/smoke-test.mjs",
-    "test": "node scripts/smoke-test.mjs && node scripts/color-qa-presets.mjs",
+    "test": "node scripts/validate-skills.mjs && node scripts/smoke-test.mjs && node scripts/color-qa-presets.mjs",
     "demo": "node examples/build_miku_demo.mjs",
     "demo:editorial": "node examples/build_editorial_demo.mjs",
     "demo:darklaunch": "node examples/build_darklaunch_demo.mjs",
@@ -36,7 +37,8 @@
     "qa:all": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx && node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx && node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx"
   },
   "devDependencies": {
-    "pptxgenjs": "^4.0.1"
+    "pptxgenjs": "^4.0.1",
+    "yaml": "^2.9.0"
   },
   "bugs": {
     "url": "https://github.com/CacinieP/ppt-skills/issues"

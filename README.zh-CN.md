@@ -83,7 +83,7 @@
 git clone https://github.com/CacinieP/ppt-skills.git
 cd ppt-skills
 npm ci          # 安装锁定依赖
-npm test        # smoke + 预置色板对比度 QA
+npm test        # skill manifest + smoke + 预置色板对比度 QA
 npm run demos   # 一次构建全部三套 demo（无需 key）
 ```
 
@@ -116,7 +116,7 @@ npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 
 | 命令 | 作用 |
 | --- | --- |
-| `npm test` | 导入/供应商/尺寸 **+** 预置色板对比度 QA |
+| `npm test` | Skill manifest **+** 导入/供应商/尺寸 **+** 预置色板对比度 QA |
 | `npm run qa:render -- deck.pptx` | **PPTX 渲染 + 启发式 QA** —— 溢出、遮挡、越界、图文比例、页码 badge。P0 即退出码 1 |
 | `npm run qa:render -- deck.pptx --render --out ./qa` | 上述 **+** 在装了 LibreOffice + poppler 时额外驱动 `soffice → pdf → jpg` |
 | `npm run qa:cjk -- --text "标题" --font-size 44 --box-width 9` | **免渲染 CJK 溢出估算**，生成前先用 |

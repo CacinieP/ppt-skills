@@ -83,7 +83,7 @@ Three locked demo decks, all generated from this repo with **zero API keys** (so
 git clone https://github.com/CacinieP/ppt-skills.git
 cd ppt-skills
 npm ci          # install locked deps
-npm test        # smoke + preset palette contrast QA
+npm test        # skill manifest + smoke + preset palette contrast QA
 npm run demos   # build all three demo PPTX (no API key needed)
 ```
 
@@ -116,7 +116,7 @@ npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 
 | Command | Purpose |
 | --- | --- |
-| `npm test` | Smoke (imports/provider/size) **+** preset palette contrast QA |
+| `npm test` | Skill manifest **+** smoke (imports/provider/size) **+** preset palette contrast QA |
 | `npm run qa:render -- deck.pptx` | **PPTX render + heuristic QA** — overflow, overlap, bounds, image aspect, page badge. P0 exits 1 |
 | `npm run qa:render -- deck.pptx --render --out ./qa` | Above **+** drive `soffice → pdf → jpg` when LibreOffice + poppler installed |
 | `npm run qa:cjk -- --text "标题" --font-size 44 --box-width 9` | **Render-free CJK overflow estimator**, use before generating |

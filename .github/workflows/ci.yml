@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies (locked)
         run: npm ci
 
+      - name: Validate skill manifests
+        run: node scripts/validate-skills.mjs
+
       - name: Run smoke tests
         run: node scripts/smoke-test.mjs
 

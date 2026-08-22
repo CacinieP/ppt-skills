@@ -1,6 +1,12 @@
 ---
 name: themed-cn-pptx
-description: Build, modify, and QA-verify Chinese + IP/character-themed + QR-embeddable EDITABLE PPTX decks using PptxGenJS, with StepFun or MiniMax AI image generation, locked aesthetic recipes, and a deterministic render-QA gate (CJK overflow, text overlap, editable-text, color contrast). Triggers: 可编辑 PPTX, 中文 PPT, PPT 验收, render QA, PptxGenJS, presentation, slide, deck, PowerPoint, 演示文稿, 幻灯片.
+description: >-
+  Build, modify, and QA-verify Chinese + IP/character-themed + QR-embeddable
+  EDITABLE PPTX decks using PptxGenJS, with StepFun or MiniMax AI image
+  generation, locked aesthetic recipes, and a deterministic render-QA gate
+  (CJK overflow, text overlap, editable-text, color contrast). Triggers:
+  可编辑 PPTX, 中文 PPT, PPT 验收, render QA, PptxGenJS, presentation, slide,
+  deck, PowerPoint, 演示文稿, 幻灯片.
 ---
 
 <aside>
