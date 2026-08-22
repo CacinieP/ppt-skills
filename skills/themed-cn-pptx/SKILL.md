@@ -2,9 +2,10 @@
 name: themed-cn-pptx
 description: >-
   Build, modify, and QA-verify Chinese + IP/character-themed + QR-embeddable
-  EDITABLE PPTX decks using PptxGenJS, with StepFun or MiniMax AI image
-  generation, locked aesthetic recipes, and a deterministic render-QA gate
-  (CJK overflow, text overlap, editable-text, color contrast). Triggers:
+  EDITABLE PPTX decks using PptxGenJS, with SOTA AI image generation via
+  OpenAI GPT Image 2 or Google Nano Banana Pro, locked aesthetic recipes,
+  and a deterministic render-QA gate (CJK overflow, text overlap,
+  editable-text, color contrast). Triggers:
   可编辑 PPTX, 中文 PPT, PPT 验收, render QA, PptxGenJS, presentation, slide,
   deck, PowerPoint, 演示文稿, 幻灯片.
 ---
@@ -18,11 +19,11 @@ description: >-
 
 **依赖技能**：标准 `pptx` skill（本 skill 是它的增量补充）
 
-**生图能力**：集成 StepFun 阶跃星辰和 MiniMax 文生图 API，API Key 从环境变量读取，不硬编码
+**生图能力**：集成 OpenAI GPT Image 2 和 Google Nano Banana Pro（Gemini 3 Pro Image）文生图 API，API Key 从环境变量读取，不硬编码
 
 **适合**：
 - 中文 PPT、IP/角色主题 PPT
-- 需要 AI 配图（StepFun / MiniMax）
+- 需要 AI 配图（GPT Image 2 / Nano Banana Pro）
 - 需要嵌入二维码
 - 需要 PDF→JPG 渲染 QA 闭环
 - 需要可编辑 PPTX（不是图片化幻灯片）
@@ -319,9 +320,9 @@ QA 时列出实际使用的 `fg/bg` 对，至少检查：正文 on 浅底、正�
 
 ---
 
-## 2.5 AI 生图 — 尺寸适配（StepFun / MiniMax）
+## 2.5 AI 生图 — 尺寸适配（GPT Image 2 / Nano Banana Pro）
 
-通过 `lib/ai-image.js` 生成配图，自动适配 PPT 排版。**StepFun 是默认和重点推荐 provider**；MiniMax 作为可选补充。两者都支持国内版 / 国际版。**不硬编码 API Key**，从环境变量或 `.env` 读取。新脚本优先导入 `ai-image.js`；旧脚本继续导入 `stepfun-image.js` 也能运行（兼容 re-export）。
+通过 `lib/ai-image.js` 生成配图，自动适配 PPT 排版。**OpenAI GPT Image 2 是默认和重点推荐 provider**（盲测竞技场 SOTA）；Google Nano Banana Pro（Gemini 3 Pro Image）作为并列 SOTA 的可选补充。**不硬编码 API Key**，从环境变量或 `.env` 读取。新脚本优先导入 `ai-image.js`；旧脚本继续导入 `stepfun-image.js` 也能运行（兼容 re-export，provider 层已换新模型）。
 
 ### 引入方式
 
@@ -330,7 +331,7 @@ import { generateSlideImage, addImageToSlide, addImageOverlay, SIZE_MAP } from "
 
 // 用法：按用途自动选比例/尺寸
 const img = await generateSlideImage({
-  provider: "stepfun-cn", // 推荐；也支持 stepfun-global / minimax-cn / minimax-global
+  provider: "openai", // 推荐；也支持 google / gpt-image / nano-banana-pro
   prompt: "赛博朋克城市夜景，中文发布会封面背景，留出标题区域",
   usage: "cover",
 });
@@ -344,118 +345,101 @@ if (img) {
 
 优先级：
 
-1. `generateSlideImage({ provider: "stepfun" | "minimax" })`
+1. `generateSlideImage({ provider: "openai" | "google" })`
 2. 环境变量 `PPT_IMAGE_PROVIDER` 或 `AI_IMAGE_PROVIDER`
-3. 如果只有 `MINIMAX_API_KEY`，自动选择 `minimax`
-4. 默认 `stepfun-cn`，保证旧脚本行为不变，并优先走 StepFun 国内开放平台
+3. 如果只有 `GOOGLE_API_KEY` / `GEMINI_API_KEY`，自动选择 `google`
+4. 默认 `openai`（GPT Image 2）
 
-可直接使用 region alias：
+可直接使用别名：
 
 ```jsx
-await generateSlideImage({ provider: "stepfun-cn", prompt, usage: "cover" });
-await generateSlideImage({ provider: "stepfun-global", prompt, usage: "cover" });
-await generateSlideImage({ provider: "minimax-cn", prompt, usage: "card" });
-await generateSlideImage({ provider: "minimax-global", prompt, usage: "card" });
+await generateSlideImage({ provider: "openai", prompt, usage: "cover" });
+await generateSlideImage({ provider: "gpt-image", prompt, usage: "cover" });
+await generateSlideImage({ provider: "google", prompt, usage: "card" });
+await generateSlideImage({ provider: "nano-banana-pro", prompt, usage: "card" });
 ```
 
 ### 用途 → 尺寸映射
 
-| **用途** | **PPT 场景** | **StepFun 尺寸** | **MiniMax 比例** | **PPTX (英寸)** |
-| --- | --- | --- | --- | --- |
-| `cover` | 封面全幅背景 | 1360×768 | 16:9 | `{ w:10, h:5.625 }` |
-| `coverOverlay` | 带文字遮罩的封面背景 | 1360×768 | 16:9 | `{ w:10, h:5.625 }` |
-| `hero` | 上半区横幅 | 1360×768 | 16:9 | `{ w:10, h:3 }` |
-| `bannerWide` | 超宽横幅 | 1360×768 + 裁切 | 21:9 | `{ w:10, h:2.45 }` |
-| `ultraWideHero` | 超宽首页/章节视觉 | 1360×768 + 裁切 | 21:9 | `{ w:10, h:2.8 }` |
-| `sideStrip` | 右侧竖版装饰条 | 768×1360 | 9:16 | `{ w:2.5, h:4.44 }` |
-| `card` | 方形卡片配图 | 1024×1024 | 1:1 | `{ w:2.5, h:2.5 }` |
-| `cardTall` | 竖版卡片配图 | 896×1184 | 3:4 | `{ w:2.3, h:3.04 }` |
-| `cardWide` | 横版卡片配图 | 1184×896 | 4:3 | `{ w:3.5, h:2.65 }` |
-| `showcase` | 产品/项目展示 | 1184×896 | 4:3 | `{ w:3.9, h:2.95 }` |
-| `phoneMockup` | 手机竖屏 mockup | 768×1360 | 9:16 | `{ w:1.8, h:3.2 }` |
-| `icon` | 小图标/占位图 | 512×512 | 1:1 | `{ w:1.5, h:1.5 }` |
+尺寸契约与旧版（StepFun/MiniMax 时代）**完全一致**，已发布的 deck 版式不受影响：
 
-适配规则：
+| **用途** | **PPT 场景** | **契约尺寸** | **GPT Image 2 传参** | **Nano Banana Pro 传参** | **PPTX (英寸)** |
+| --- | --- | --- | --- | --- | --- |
+| `cover` | 封面全幅背景 | 1360×768 | `size: 1360x768` | `16:9 + 2K` | `{ w:10, h:5.625 }` |
+| `coverOverlay` | 带文字遮罩的封面背景 | 1360×768 | `size: 1360x768` | `16:9 + 2K` | `{ w:10, h:5.625 }` |
+| `hero` | 上半区横幅 | 1360×768 | `size: 1360x768` | `16:9 + 2K` | `{ w:10, h:3 }` |
+| `bannerWide` | 超宽横幅 | 1360×768 | `size: 1344x576`（原生 21:9） | `21:9 + 2K` | `{ w:10, h:2.45 }` |
+| `ultraWideHero` | 超宽首页/章节视觉 | 1360×768 | `size: 1344x576`（原生 21:9） | `21:9 + 2K` | `{ w:10, h:2.8 }` |
+| `sideStrip` | 右侧竖版装饰条 | 768×1360 | `size: 768x1360` | `9:16 + 2K` | `{ w:2.5, h:4.44 }` |
+| `card` | 方形卡片配图 | 1024×1024 | `size: 1024x1024` | `1:1 + 1K` | `{ w:2.5, h:2.5 }` |
+| `cardTall` | 竖版卡片配图 | 896×1184 | `size: 896x1184` | `3:4 + 1K` | `{ w:2.3, h:3.04 }` |
+| `cardWide` | 横版卡片配图 | 1184×896 | `size: 1184x896` | `4:3 + 1K` | `{ w:3.5, h:2.65 }` |
+| `showcase` | 产品/项目展示 | 1184×896 | `size: 1184x896` | `4:3 + 2K` | `{ w:3.9, h:2.95 }` |
+| `phoneMockup` | 手机竖屏 mockup | 768×1360 | `size: 768x1360` | `9:16 + 1K` | `{ w:1.8, h:3.2 }` |
+| `icon` | 小图标/占位图 | 512×512 | `size: 1024x1024`（向上适配） | `1:1 + 1K` | `{ w:1.5, h:1.5 }` |
 
-- StepFun `step-image-edit-2` 使用官方 `size` 字符串：`1024x1024`、`768x1360`、`896x1184`、`1360x768`、`1184x896`。文档标注该字符串是 `height x width`，但在本 skill 中按**视觉用途**映射到 PPT：`cover/hero` 固定用 `1360x768`，`showcase/cardWide` 固定用 `1184x896`，`phoneMockup/sideStrip` 固定用 `768x1360`。
-- StepFun 当前单次文生图按 1 张处理；如需要多张候选图，循环调用，不依赖 `n > 1`。
-- MiniMax 优先使用 `aspect_ratio` 而不是 `width/height`：`16:9`、`4:3`、`1:1`、`3:4`、`9:16`。只有确实需要自定义像素时才传 `width/height`，并保证 512-2048 且能被 8 整除。
-- `cover`、`hero`、`bannerWide`、`ultraWideHero`、`showcase`、`phoneMockup` 不手写尺寸，统一从 `SIZE_MAP` 或 `getImageUsageConfig()` 取，避免把 MiniMax ratio 和 StepFun size 混用。
-- `bannerWide` / `ultraWideHero`：MiniMax 原生 `21:9`；StepFun 用 `1360x768` 生成，再按 `cropPolicy` 和 `safeZone` 放入 PPT。
-- 返回 URL 一律立即下载到 `assets/<provider>/`，PPTX 只引用本地文件，避免 StepFun/MiniMax 临时链接过期。
+适配规则（尺寸适配传参）：
+
+- **GPT Image 2**（`/v1/images/generations`，模型 `gpt-image-2`）接受满足以下约束的任意 `size`：两边均为 16 的倍数、最长边 ≤ 3840、长短边比例 ≤ 3:1、总像素在 655,360–8,294,400。SIZE_MAP 中的契约尺寸除 `icon` 外全部直传；`icon` 的 512×512（262,144 像素）低于最小像素数，适配为 1024×1024（1:1 不变）；`bannerWide` / `ultraWideHero` 以原生 21:9 的 `1344x576` 生成，不再需要 16:9 裁切。用户自定义 `size` 由 `adaptSizeForGptImage()` 自动适配并告警。gpt-image 模型只返回 `b64_json`。
+- **Nano Banana Pro**（Interactions API `/v1beta/interactions`，模型 `gemini-3-pro-image`）在 `response_format` 中传 `aspect_ratio` + `image_size`：`16:9`、`21:9`、`9:16`、`1:1`、`3:4`、`4:3` 全部原生支持；`image_size` 按版面大小取 `2K`（全幅/横幅/侧栏）或 `1K`（卡片/图标），"K" 必须大写。用户自定义 `aspectRatio` 由 `adaptAspectRatioForGemini()` 按数值最近原则适配并告警。
+- `cover`、`hero`、`bannerWide`、`ultraWideHero`、`showcase`、`phoneMockup` 不手写尺寸，统一从 `SIZE_MAP` 或 `getImageUsageConfig()` 取，不混用 OpenAI size 和 Google ratio。
+- 两个 provider 都返回 base64，工具统一落盘到 `assets/<provider>/`，PPTX 只引用本地文件。
 
 ### 环境变量配置
 
 ```bash
 # 可选：默认生图供应商
-export PPT_IMAGE_PROVIDER=stepfun   # stepfun | minimax
-export PPT_IMAGE_REGION=cn          # cn | global
+export PPT_IMAGE_PROVIDER=openai    # openai | google
 
-# StepFun（国内 https://platform.stepfun.com；国际 https://platform.stepfun.ai）
-export STEPFUN_API_KEY=sk-xxx
-export STEPFUN_REGION=cn            # cn -> api.stepfun.com；global -> api.stepfun.ai
-export STEPFUN_API_MODE=platform    # platform | step_plan
-# export STEPFUN_BASE_URL=https://api.stepfun.com/v1  # 可选强制覆盖
+# OpenAI GPT Image 2（https://platform.openai.com）
+export OPENAI_API_KEY=sk-xxx
+# export OPENAI_BASE_URL=https://api.openai.com/v1      # 可选强制覆盖
+# export OPENAI_IMAGE_MODEL=gpt-image-2                 # 可选模型覆盖
 
-# MiniMax（国内 https://platform.minimaxi.com；国际 https://platform.minimax.io）
-export MINIMAX_API_KEY=sk-xxx
-export MINIMAX_REGION=global        # cn -> api.minimaxi.com；global -> api.minimax.io
-# export MINIMAX_BASE_URL=https://api.minimax.io/v1   # 可选强制覆盖
+# Google Nano Banana Pro（https://aistudio.google.com/apikey）
+export GOOGLE_API_KEY=xxx            # GEMINI_API_KEY 也可以
+# export GOOGLE_BASE_URL=https://generativelanguage.googleapis.com/v1beta  # 可选强制覆盖
+# export GOOGLE_IMAGE_MODEL=gemini-3-pro-image         # 可选模型覆盖
 ```
 
 `ai-image.js` 会自动加载项目根目录 `.env`，但 shell / MCP / CI 中已有的 `process.env` 优先。
 
 ### Provider 参数
 
-- StepFun：使用 `/images/generations`，按具体 `size` 生成，适合精确 PPT 预设。
-- MiniMax：使用 `/image_generation`，按 `aspect_ratio` 生成；返回 URL 时工具会立即下载到本地，避免 URL 过期影响 PPT。
-- StepFun 国内开放平台默认 Base URL：`https://api.stepfun.com/v1`
-- StepFun 国际开放平台默认 Base URL：`https://api.stepfun.ai/v1`
-- StepFun Step Plan 国内 / 国际专属路径：`https://api.stepfun.com/step_plan/v1` / `https://api.stepfun.ai/step_plan/v1`
-- MiniMax 国内 / 国际默认 Base URL：`https://api.minimaxi.com/v1` / `https://api.minimax.io/v1`
-- MiniMax 可传 `promptOptimizer`、`seed`、`n`、`subjectReference`：
+- OpenAI：`/images/generations`，`size` 满足上述约束即任意尺寸直传，`quality` 可传 `high | medium | low`，响应为 `b64_json`。
+- Google：Interactions API `/interactions`，`response_format: { type: "image", aspect_ratio, image_size }`，可传 `seed`（`generation_config.seed`）与 `outputFormat`（`image/png` | `image/jpeg`），单次 1 张、`n > 1` 时循环调用。
 
 ```jsx
 const img = await generateSlideImage({
-  provider: "minimax",
+  provider: "openai",
+  prompt,
+  usage: "cover",
+  quality: "high",
+});
+```
+
+```jsx
+const img = await generateSlideImage({
+  provider: "nano-banana-pro",
   prompt,
   usage: "showcase",
-  promptOptimizer: true,
   seed: 42,
 });
 ```
 
-StepFun 可传 `steps`、`cfgScale`、`negativePrompt`、`textMode`、`seed`、`apiMode`：
+### API Key 申请与使用指南（OpenAI 推荐）
 
-```jsx
-const img = await generateSlideImage({
-  provider: "stepfun-cn",
-  prompt,
-  usage: "cover",
-  steps: 8,
-  cfgScale: 1.0,
-  textMode: true,
-});
-```
-
-### 开放平台申请与使用指南（StepFun 推荐）
-
-1. 选择版本：国内账号用 `https://platform.stepfun.com`，国际账号用 `https://platform.stepfun.ai`。
-2. 注册 / 登录后进入用户中心或 API Key 页面。
-3. 创建 API Key。只放在本地 `.env`、系统环境变量或 CI Secret，不写进源码。
-4. 普通开放平台调用用 `STEPFUN_API_MODE=platform`；如已订阅 Step Plan 且要走专属路径，用 `STEPFUN_API_MODE=step_plan`。
-5. 在构建目录创建 `.env`：
+1. OpenAI 在 `https://platform.openai.com/api-keys` 创建 Key；Google 在 `https://aistudio.google.com/apikey` 创建 Key。
+2. Key 只放在本地 `.env`、系统环境变量或 CI Secret，不写进源码。
+3. 在构建目录创建 `.env`：
 
 ```bash
-PPT_IMAGE_PROVIDER=stepfun
-PPT_IMAGE_REGION=cn
-STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn
-STEPFUN_API_MODE=platform
+PPT_IMAGE_PROVIDER=openai
+OPENAI_API_KEY=sk-xxx
 ```
 
-6. 先跑 `npm test` 验证导入、provider/region 解析、无 key 降级。
-7. 构建 PPT 时优先使用 `provider: "stepfun-cn"`；国际版账号改为 `provider: "stepfun-global"` 或设置 `STEPFUN_REGION=global`。
+4. 先跑 `npm test` 验证导入、provider 解析、无 key 降级。
+5. 构建 PPT 时优先使用 `provider: "openai"`；用 Google 时改为 `provider: "google"` 或 `provider: "nano-banana-pro"`。
 
 ### 图片排版规范
 
@@ -470,10 +454,8 @@ STEPFUN_API_MODE=platform
 
 | Provider | 模型 | 支持尺寸 / 比例 |
 | --- | --- | --- |
-| StepFun | `step-image-edit-2`（默认） | 1024×1024, 768×1360, 896×1184, 1360×768, 1184×896 |
-| StepFun | `step-2x-large` | 256×256, 512×512, 768×768, 1024×1024, 1280×800, 800×1280 |
-| StepFun | `step-1x-medium` | 256×256, 512×512, 768×768, 1024×1024, 1280×800, 800×1280 |
-| MiniMax | `image-01` | 1:1, 16:9, 4:3, 3:2, 2:3, 3:4, 9:16, 21:9 |
+| OpenAI | `gpt-image-2`（默认） | 任意尺寸：两边 16 的倍数、最长边 ≤ 3840、比例 ≤ 3:1、总像素 655,360–8,294,400 |
+| Google | `gemini-3-pro-image`（Nano Banana Pro） | 1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9 × 1K/2K/4K |
 
 ---
 

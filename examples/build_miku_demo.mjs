@@ -133,7 +133,7 @@ content.addShape(pres.shapes.RECTANGLE, { x: 1.42, y: 1.42, w: 0.3, h: 0.05, fil
 const features = [
   { emoji: "🎨", title: "Editable PPTX", desc: "Real .pptx output\nnot slide images" },
   { emoji: "CJK", title: "Chinese-First", desc: "Microsoft YaHei\nfull-width punctuation" },
-  { emoji: "🤖", title: "AI Images", desc: "StepFun / MiniMax\nauto ratio matching" },
+  { emoji: "🤖", title: "AI Images", desc: "GPT Image 2 / Nano Banana\nauto ratio matching" },
 ];
 
 features.forEach((f, i) => {

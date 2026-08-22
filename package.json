@@ -1,7 +1,7 @@
 {
   "name": "ppt-skills",
-  "version": "1.4.0",
-  "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows, AI image helpers, and a render-QA gate.",
+  "version": "2.0.0",
+  "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows, AI image helpers (GPT Image 2 / Nano Banana Pro), and a render-QA gate.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -15,8 +15,8 @@
     "pptxgenjs",
     "cjk",
     "presentation",
-    "stepfun",
-    "minimax",
+    "gpt-image-2",
+    "nano-banana-pro",
     "ai-image",
     "render-qa",
     "qa"

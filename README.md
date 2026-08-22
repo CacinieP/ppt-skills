@@ -16,7 +16,7 @@
 
 Open-source skills for generating and **accepting** real, **editable, CJK-aware PPTX decks** built with PptxGenJS — verified by a deterministic QA gate, not just eyeballed.
 
-The first released skill, [`themed-cn-pptx`](skills/themed-cn-pptx/), ships two **locked aesthetic recipes** (editorial-grid, dark-launch), a provider-aware AI image layer (StepFun / MiniMax), and three QA tools (render QA, CJK overflow, editable-text check).
+The first released skill, [`themed-cn-pptx`](skills/themed-cn-pptx/), ships two **locked aesthetic recipes** (editorial-grid, dark-launch), a provider-aware AI image layer (OpenAI GPT Image 2 / Google Nano Banana Pro), and three QA tools (render QA, CJK overflow, editable-text check).
 
 ---
 
@@ -71,7 +71,7 @@ Three locked demo decks, all generated from this repo with **zero API keys** (so
 - **CJK-first layout** — font fallback, full-width punctuation, conservative sizes; overflow predicted *before* render.
 - **Render QA gate** — `render-qa.mjs` catches overflow, overlap, off-canvas, bad image ratios, missing page badges.
 - **Locked recipes** — two locked aesthetic recipes (editorial-grid, dark-launch) so you stop re-deciding every detail.
-- **Provider-aware AI images** — StepFun (recommended) / MiniMax, CN + global regions, PPT-friendly size presets.
+- **Provider-aware AI images** — OpenAI GPT Image 2 (recommended) / Google Nano Banana Pro, SOTA blind-vote leaders, PPT-friendly size presets with automatic size adaptation.
 - **WCAG color QA** — sRGB luminance contrast, not eyeballing; CI gate fails on P0.
 - **Graceful degradation** — no API key? builds continue with solid-color placeholders, never crash.
 
@@ -136,15 +136,15 @@ npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 
 ## 🎨 AI Image Generation
 
-Use [`skills/themed-cn-pptx/lib/ai-image.js`](skills/themed-cn-pptx/lib/ai-image.js). No key → returns `null`, build falls back to placeholders.
+Use [`skills/themed-cn-pptx/lib/ai-image.js`](skills/themed-cn-pptx/lib/ai-image.js) with **SOTA models**: OpenAI **GPT Image 2** (recommended, top of the text-to-image blind-vote arenas) and Google **Nano Banana Pro** (`gemini-3-pro-image`). No key → returns `null`, build falls back to placeholders.
 
 ```js
 import { generateSlideImage, addImageToSlide, addImageOverlay } from "./lib/ai-image.js";
 
 const cover = await generateSlideImage({
-  provider: "stepfun-cn",        // recommended; also: stepfun-global, minimax-cn, minimax-global
+  provider: "openai",            // recommended; also: google / gpt-image / nano-banana-pro
   prompt: "teal tech cover background, clean whitespace, room for a title",
-  usage: "cover",                // -> 1360x768 on StepFun, 16:9 on MiniMax
+  usage: "cover",                // -> size 1360x768 on GPT Image 2, 16:9 + 2K on Nano Banana Pro
 });
 
 if (cover) {
@@ -157,49 +157,46 @@ if (cover) {
 
 1. `provider` arg to `generateSlideImage()`
 2. `PPT_IMAGE_PROVIDER` / `AI_IMAGE_PROVIDER` env
-3. MiniMax only if `MINIMAX_API_KEY` set and no `STEPFUN_API_KEY`
-4. Default: StepFun CN
+3. Google only if `GOOGLE_API_KEY`/`GEMINI_API_KEY` set and no `OPENAI_API_KEY`
+4. Default: OpenAI GPT Image 2
 
 ### Environment variables
 
 ```bash
-PPT_IMAGE_PROVIDER=stepfun       # stepfun | minimax    (stepfun recommended)
-PPT_IMAGE_REGION=cn              # cn | global
-STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn                # cn -> api.stepfun.com | global -> api.stepfun.ai
-STEPFUN_API_MODE=platform        # platform | step_plan
-MINIMAX_API_KEY=sk-xxx
-MINIMAX_REGION=global            # cn -> api.minimaxi.com | global -> api.minimax.io
+PPT_IMAGE_PROVIDER=openai        # openai | google    (openai recommended)
+OPENAI_API_KEY=sk-xxx
+GOOGLE_API_KEY=xxx               # GEMINI_API_KEY also read
+# optional overrides:
+# OPENAI_BASE_URL / GOOGLE_BASE_URL / OPENAI_IMAGE_MODEL / GOOGLE_IMAGE_MODEL
 ```
 
 The helper auto-loads `.env` on import; shell/CI vars take priority. Create `.env` locally — it's gitignored, never commit keys.
 
 ### Size → layout mapping
 
-| Usage | StepFun size | MiniMax ratio | PPTX layout |
+The usage → size/ratio/layout contract is unchanged from the previous StepFun/MiniMax provider layer, so existing decks keep their layout slots.
+
+| Usage | GPT Image 2 `size` | Nano Banana Pro ratio + size | PPTX layout |
 | --- | --- | --- | --- |
-| `cover` / `coverOverlay` | `1360x768` | `16:9` | `10 × 5.625 in` |
-| `hero` / `bannerWide` | `1360x768` (+crop) | `16:9` / `21:9` | `10 × 3 in` / `10 × 2.45 in` |
-| `sideStrip` / `phoneMockup` | `768x1360` | `9:16` | `2.5 × 4.44 in` / `1.8 × 3.2 in` |
-| `card` | `1024x1024` | `1:1` | `2.5 × 2.5 in` |
-| `cardWide` / `showcase` | `1184x896` | `4:3` | `3.5 × 2.65 in` / `3.9 × 2.95 in` |
-| `cardTall` | `896x1184` | `3:4` | `2.3 × 3.04 in` |
-| `icon` | `512x512` | `1:1` | `1.5 × 1.5 in` |
+| `cover` / `coverOverlay` | `1360x768` | `16:9` + `2K` | `10 × 5.625 in` |
+| `hero` | `1360x768` | `16:9` + `2K` | `10 × 3 in` |
+| `bannerWide` / `ultraWideHero` | `1344x576` (native 21:9) | `21:9` + `2K` | `10 × 2.45 in` / `10 × 2.8 in` |
+| `sideStrip` / `phoneMockup` | `768x1360` | `9:16` + `2K`/`1K` | `2.5 × 4.44 in` / `1.8 × 3.2 in` |
+| `card` | `1024x1024` | `1:1` + `1K` | `2.5 × 2.5 in` |
+| `cardWide` / `showcase` | `1184x896` | `4:3` + `1K`/`2K` | `3.5 × 2.65 in` / `3.9 × 2.95 in` |
+| `cardTall` | `896x1184` | `3:4` + `1K` | `2.3 × 3.04 in` |
+| `icon` | `1024x1024` (adapted from 512x512) | `1:1` + `1K` | `1.5 × 1.5 in` |
 
-Rules: use `getImageUsageConfig(usage, provider)` or `SIZE_MAP`; never hand-mix StepFun concrete sizes with MiniMax ratios. StepFun `step-image-edit-2` exposes exact PPT-friendly pixel sizes — that's why it's recommended.
+Size-adaptation rules: `gpt-image-2` accepts any size whose edges are multiples of 16, max edge ≤ 3840, long:short ≤ 3:1, and total pixels in [655,360, 8,294,400] — every SIZE_MAP size passes directly except `icon` (512×512 is below the pixel minimum, snapped to 1024×1024) and the 21:9 banners (generated natively at 1344×576 instead of cropping 16:9). User-supplied sizes go through `adaptSizeForGptImage()`. Nano Banana Pro takes `aspect_ratio` + `image_size` (`1K/2K/4K`); all ratios used here are native, and unsupported ratios snap to the nearest via `adaptAspectRatioForGemini()`.
 
-### CN / Global endpoints
+### Endpoints
 
-| Provider | Region | Default Base URL |
+| Provider | Model | Default Base URL |
 | --- | --- | --- |
-| StepFun | CN | `https://api.stepfun.com/v1` |
-| StepFun | Global | `https://api.stepfun.ai/v1` |
-| StepFun Step Plan | CN | `https://api.stepfun.com/step_plan/v1` |
-| StepFun Step Plan | Global | `https://api.stepfun.ai/step_plan/v1` |
-| MiniMax | CN | `https://api.minimaxi.com/v1` |
-| MiniMax | Global | `https://api.minimax.io/v1` |
+| OpenAI | `gpt-image-2` | `https://api.openai.com/v1` (`/images/generations`) |
+| Google | `gemini-3-pro-image` | `https://generativelanguage.googleapis.com/v1beta` (Interactions API `/interactions`) |
 
-Official docs: [StepFun CN](https://platform.stepfun.com/docs/zh/api-reference/images/image) · [StepFun Global](https://platform.stepfun.ai/docs/en/api-reference/images/image) · [StepFun Step Plan](https://platform.stepfun.com/docs/zh/step-plan/integrations/image-api) · [MiniMax CN](https://platform.minimaxi.com/docs/api-reference/image-generation-i2i)
+Official docs: [OpenAI image generation](https://developers.openai.com/api/docs/guides/image-generation) · [Gemini image generation](https://ai.google.dev/gemini-api/docs/image-generation)
 
 ---
 
@@ -213,6 +210,10 @@ pdftoppm -jpeg -r 100 deck.pdf slide
 ```
 
 Watch for: CJK overflow, cropped full-width punctuation, unreadable text on images, QR contrast, footer collisions, AI image aspect mismatches. `render-qa.mjs` automates the deterministic checks.
+
+### About `npm audit` warnings
+
+`npm ci` reports two high-severity advisories against `image-size` ([GHSA-w3rx-r6r6-pgpr](https://github.com/advisories/GHSA-w3rx-r6r6-pgpr), [GHSA-5p2g-fcmc-qvqq](https://github.com/advisories/GHSA-5p2g-fcmc-qvqq)). They affect **every published `image-size` version (<= 2.0.2)** and arrive transitively through `pptxgenjs`, so they cannot be fixed from this repo: overriding to `image-size@2.x` breaks `pptxgenjs` (2.x removed the callable default export), and the only `npm audit fix --force` "fix" downgrades `pptxgenjs` to the 2018 `1.1.5` API. Both advisories are denial-of-service bugs in the ICNS/JXL/HEIF parsers, only triggerable by feeding `pptxgenjs` a maliciously crafted image file — not a realistic input for locally generated deck assets. Track the upstream `pptxgenjs` bump instead; do not paper over this with dependency overrides.
 
 ### Color QA rules
 
@@ -234,7 +235,7 @@ Watch for: CJK overflow, cropped full-width punctuation, unreadable text on imag
 | **Best for** | offline talks, demo days, personal keynotes | decks delivered as `.pptx`, edited later, stable Chinese type |
 | **Aesthetic system** | two fixed templates (magazine, Swiss) | two locked recipes + extensible theme system |
 | **QA approach** | HTML layout validator (`data-layout`) | PPTX render + heuristic QA, CJK overflow, editable-text, color contrast |
-| **Image** | Codex/GPT-Image into HTML | provider layer (StepFun/MiniMax) returning PPTX layout metadata |
+| **Image** | Codex/GPT-Image into HTML | provider layer (GPT Image 2 / Nano Banana Pro) returning PPTX layout metadata |
 
 **Two routes, complementary.** Browser talks → HTML; deliverable `.pptx` → this repo.
 

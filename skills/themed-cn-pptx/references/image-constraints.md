@@ -9,7 +9,7 @@ Declare each generated image before prompting:
 ```json
 {
   "usage": "cover",
-  "provider": "stepfun-cn",
+  "provider": "openai",
   "logicalRatio": "16:9",
   "size": "1360x768",
   "safeZone": "left 45% title-safe",
@@ -22,20 +22,20 @@ Declare each generated image before prompting:
 
 ## Usage Mapping
 
-| Usage | Need | StepFun | MiniMax | Notes |
+| Usage | Need | GPT Image 2 | Nano Banana Pro | Notes |
 | --- | --- | --- | --- | --- |
-| `cover` | full slide cover | `1360x768` | `16:9` | must leave title-safe area |
-| `coverOverlay` | cover under text | `1360x768` | `16:9` | always add 40-55% overlay |
-| `hero` | top visual band | `1360x768` | `16:9` | crop to about 10 x 3 in |
-| `bannerWide` | ultra-wide banner | `1360x768` + crop | `21:9` | StepFun requires safe-zone crop |
-| `ultraWideHero` | wide title visual | `1360x768` + crop | `21:9` | keep title side clean |
-| `sideStrip` | vertical side art | `768x1360` | `9:16` | no text or faces near crop edges |
-| `card` | square card art | `1024x1024` | `1:1` | no embedded labels |
-| `cardTall` | tall card art | `896x1184` | `3:4` | good for process/persona cards |
-| `cardWide` | wide card art | `1184x896` | `4:3` | good for project preview |
-| `showcase` | product/project panel | `1184x896` | `4:3` | avoid fake app chrome unless requested |
-| `phoneMockup` | mobile mockup | `768x1360` | `9:16` | use real screenshots when available |
-| `icon` | small illustrative icon | `512x512` | `1:1` | simple silhouette, no tiny details |
+| `cover` | full slide cover | `1360x768` | `16:9 + 2K` | must leave title-safe area |
+| `coverOverlay` | cover under text | `1360x768` | `16:9 + 2K` | always add 40-55% overlay |
+| `hero` | top visual band | `1360x768` | `16:9 + 2K` | crop to about 10 x 3 in |
+| `bannerWide` | ultra-wide banner | `1344x576` (native 21:9) | `21:9 + 2K` | no crop needed on either provider |
+| `ultraWideHero` | wide title visual | `1344x576` (native 21:9) | `21:9 + 2K` | keep title side clean |
+| `sideStrip` | vertical side art | `768x1360` | `9:16 + 2K` | no text or faces near crop edges |
+| `card` | square card art | `1024x1024` | `1:1 + 1K` | no embedded labels |
+| `cardTall` | tall card art | `896x1184` | `3:4 + 1K` | good for process/persona cards |
+| `cardWide` | wide card art | `1184x896` | `4:3 + 1K` | good for project preview |
+| `showcase` | product/project panel | `1184x896` | `4:3 + 2K` | avoid fake app chrome unless requested |
+| `phoneMockup` | mobile mockup | `768x1360` | `9:16 + 1K` | use real screenshots when available |
+| `icon` | small illustrative icon | `1024x1024` (adapted from 512x512) | `1:1 + 1K` | simple silhouette, no tiny details |
 
 ## Prompt Rules
 
@@ -55,8 +55,8 @@ text, typography, logo, watermark, QR code, signature, page number, slide title,
 
 ## Provider Constraints
 
-- StepFun is recommended when exact PPT-friendly pixel sizes are needed.
-- StepFun `bannerWide` and `ultraWideHero` use `1360x768` and rely on PPT crop/layout; keep important content inside the safe zone.
-- MiniMax is preferred for native `21:9` ultra-wide imagery.
-- MiniMax custom `width/height` must be 512-2048 and divisible by 8; prefer `aspect_ratio` for deck work.
-- Always download returned URLs immediately and embed local files into PPTX.
+- OpenAI `gpt-image-2` is the recommended default: exact PPT-friendly pixel sizes pass through directly (both edges multiples of 16, max edge 3840, long:short <= 3:1, total pixels 655,360-8,294,400); out-of-range sizes are adapted by `adaptSizeForGptImage()` with a warning.
+- `icon` 512x512 is below the gpt-image-2 minimum pixel count, so it is generated at 1024x1024 (1:1 unchanged); Nano Banana Pro has no sub-1K output either.
+- `bannerWide` and `ultraWideHero` generate natively at 21:9 (`1344x576` on OpenAI, `21:9` on Google) — no crop needed; keep important content inside the safe zone anyway.
+- Google `gemini-3-pro-image` (Nano Banana Pro) uses `aspect_ratio` + `image_size` (`1K/2K/4K`, uppercase K); unsupported ratios snap to the numerically nearest supported ratio.
+- Both providers return base64 data; the helper always writes local files under `assets/<provider>/` and embeds those into PPTX.

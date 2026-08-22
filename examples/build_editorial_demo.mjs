@@ -11,14 +11,15 @@
  */
 
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { mkdir } from "node:fs/promises";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const recipePath = resolve(__dirname, "..", "skills", "themed-cn-pptx", "recipes", "recipe-editorial-grid.mjs");
 
+// Dynamic import() needs a file:// URL on Windows, not a bare absolute path.
 const { default: pptxgen } = await import("pptxgenjs");
-const { build } = await import(recipePath);
+const { build } = await import(pathToFileURL(recipePath).href);
 
 const pres = new pptxgen();
 build(pres, { deckLabel: "Editorial Grid · ppt-skills" });

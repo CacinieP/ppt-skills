@@ -16,7 +16,7 @@
 
 用 PptxGenJS 生成并**验收**真实、**可编辑、适配中文排版的 PPTX** 的开源技能合集 —— 由一道确定性 QA 门禁把关，而非肉眼。
 
-首个技能 [`themed-cn-pptx`](skills/themed-cn-pptx/) 内置两套**锁定审美 recipe**（editorial-grid、dark-launch）、provider 感知的 AI 配图层（StepFun / MiniMax），以及三个 QA 工具（渲染 QA、CJK 溢出、可编辑性检查）。
+首个技能 [`themed-cn-pptx`](skills/themed-cn-pptx/) 内置两套**锁定审美 recipe**（editorial-grid、dark-launch）、provider 感知的 AI 配图层（OpenAI GPT Image 2 / Google Nano Banana Pro），以及三个 QA 工具（渲染 QA、CJK 溢出、可编辑性检查）。
 
 ---
 
@@ -71,7 +71,7 @@
 - **中文排版优先** —— 字体回退、全角符号、保守字号；溢出在渲染前预测。
 - **渲染 QA 门禁** —— `render-qa.mjs` 捕捉溢出、遮挡、越界、比例错误、缺页码 badge。
 - **锁定配方** —— 两套锁定 recipe（editorial-grid、dark-launch），不用每次重新决定。
-- **供应商感知 AI 配图** —— StepFun（推荐）/ MiniMax，国内/国际版，PPT 友好尺寸预设。
+- **供应商感知 AI 配图** —— OpenAI GPT Image 2（推荐）/ Google Nano Banana Pro，盲测竞技场 SOTA 双选，PPT 友好尺寸预设 + 自动尺寸适配。
 - **WCAG 色彩 QA** —— sRGB 亮度对比，非肉眼；CI 门禁遇 P0 即失败。
 - **优雅降级** —— 没有 API key？纯色占位继续生成，绝不崩溃。
 
@@ -136,15 +136,15 @@ npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 
 ## 🎨 AI 配图
 
-用 [`skills/themed-cn-pptx/lib/ai-image.js`](skills/themed-cn-pptx/lib/ai-image.js)。没有 key → 返回 `null`，构建回退到占位图。
+用 [`skills/themed-cn-pptx/lib/ai-image.js`](skills/themed-cn-pptx/lib/ai-image.js)，模型为 **SOTA 双选**：OpenAI **GPT Image 2**（推荐，文生图盲测竞技场第一）和 Google **Nano Banana Pro**（`gemini-3-pro-image`）。没有 key → 返回 `null`，构建回退到占位图。
 
 ```js
 import { generateSlideImage, addImageToSlide, addImageOverlay } from "./lib/ai-image.js";
 
 const cover = await generateSlideImage({
-  provider: "stepfun-cn",        // 推荐；也支持 stepfun-global / minimax-cn / minimax-global
+  provider: "openai",            // 推荐；也支持 google / gpt-image / nano-banana-pro
   prompt: "青绿色科技封面背景，干净留白，留出标题区域",
-  usage: "cover",                // StepFun -> 1360x768，MiniMax -> 16:9
+  usage: "cover",                // GPT Image 2 -> 1360x768，Nano Banana Pro -> 16:9 + 2K
 });
 
 if (cover) {
@@ -157,49 +157,46 @@ if (cover) {
 
 1. `generateSlideImage()` 的 `provider` 参数
 2. `PPT_IMAGE_PROVIDER` / `AI_IMAGE_PROVIDER` 环境变量
-3. 仅当 `MINIMAX_API_KEY` 存在且无 `STEPFUN_API_KEY` 时选 MiniMax
-4. 默认：StepFun 国内版
+3. 仅当 `GOOGLE_API_KEY` / `GEMINI_API_KEY` 存在且无 `OPENAI_API_KEY` 时选 Google
+4. 默认：OpenAI GPT Image 2
 
 ### 环境变量
 
 ```bash
-PPT_IMAGE_PROVIDER=stepfun       # stepfun | minimax    （推荐 stepfun）
-PPT_IMAGE_REGION=cn              # cn | global
-STEPFUN_API_KEY=sk-xxx
-STEPFUN_REGION=cn                # cn -> api.stepfun.com | global -> api.stepfun.ai
-STEPFUN_API_MODE=platform        # platform | step_plan
-MINIMAX_API_KEY=sk-xxx
-MINIMAX_REGION=global            # cn -> api.minimaxi.com | global -> api.minimax.io
+PPT_IMAGE_PROVIDER=openai        # openai | google    （推荐 openai）
+OPENAI_API_KEY=sk-xxx
+GOOGLE_API_KEY=xxx               # GEMINI_API_KEY 也可以
+# 可选覆盖：
+# OPENAI_BASE_URL / GOOGLE_BASE_URL / OPENAI_IMAGE_MODEL / GOOGLE_IMAGE_MODEL
 ```
 
 助手在导入时自动读取 `.env`；shell/CI 变量优先级更高。`.env` 只放本地（已 gitignore），切勿提交 key。
 
 ### 尺寸映射
 
-| 用途 | StepFun 尺寸 | MiniMax 比例 | PPTX 布局 |
+用途 → 尺寸/比例/版式契约与上一版（StepFun/MiniMax）完全一致，已发布 deck 的版式不受影响。
+
+| 用途 | GPT Image 2 `size` | Nano Banana Pro 比例 + 档位 | PPTX 布局 |
 | --- | --- | --- | --- |
-| `cover` / `coverOverlay` | `1360x768` | `16:9` | `10 × 5.625 in` |
-| `hero` / `bannerWide` | `1360x768`（+裁切） | `16:9` / `21:9` | `10 × 3 in` / `10 × 2.45 in` |
-| `sideStrip` / `phoneMockup` | `768x1360` | `9:16` | `2.5 × 4.44 in` / `1.8 × 3.2 in` |
-| `card` | `1024x1024` | `1:1` | `2.5 × 2.5 in` |
-| `cardWide` / `showcase` | `1184x896` | `4:3` | `3.5 × 2.65 in` / `3.9 × 2.95 in` |
-| `cardTall` | `896x1184` | `3:4` | `2.3 × 3.04 in` |
-| `icon` | `512x512` | `1:1` | `1.5 × 1.5 in` |
+| `cover` / `coverOverlay` | `1360x768` | `16:9` + `2K` | `10 × 5.625 in` |
+| `hero` | `1360x768` | `16:9` + `2K` | `10 × 3 in` |
+| `bannerWide` / `ultraWideHero` | `1344x576`（原生 21:9） | `21:9` + `2K` | `10 × 2.45 in` / `10 × 2.8 in` |
+| `sideStrip` / `phoneMockup` | `768x1360` | `9:16` + `2K`/`1K` | `2.5 × 4.44 in` / `1.8 × 3.2 in` |
+| `card` | `1024x1024` | `1:1` + `1K` | `2.5 × 2.5 in` |
+| `cardWide` / `showcase` | `1184x896` | `4:3` + `1K`/`2K` | `3.5 × 2.65 in` / `3.9 × 2.95 in` |
+| `cardTall` | `896x1184` | `3:4` + `1K` | `2.3 × 3.04 in` |
+| `icon` | `1024x1024`（512x512 向上适配） | `1:1` + `1K` | `1.5 × 1.5 in` |
 
-规则：用 `getImageUsageConfig(usage, provider)` 或 `SIZE_MAP`，不要手写混用 StepFun 尺寸和 MiniMax 比例。StepFun `step-image-edit-2` 支持精确的 PPT 友好像素尺寸，这也是推荐它的原因。
+尺寸适配规则：`gpt-image-2` 接受任意满足约束的 `size`（两边 16 的倍数、最长边 ≤ 3840、长短边比例 ≤ 3:1、总像素 655,360–8,294,400）——SIZE_MAP 契约尺寸除 `icon`（512×512 低于最小像素数，适配为 1024×1024）和 21:9 横幅（原生 `1344x576` 生成，不再裁切 16:9）外全部直传；用户自定义尺寸经 `adaptSizeForGptImage()` 自动适配。Nano Banana Pro 传 `aspect_ratio` + `image_size`（`1K/2K/4K`，K 必须大写）；所需比例全部原生支持，不支持的比例由 `adaptAspectRatioForGemini()` 按数值最近适配。
 
-### 国内 / 国际版端点
+### 端点
 
-| 供应商 | 版本 | 默认 Base URL |
+| 供应商 | 模型 | 默认 Base URL |
 | --- | --- | --- |
-| StepFun | 国内 | `https://api.stepfun.com/v1` |
-| StepFun | 国际 | `https://api.stepfun.ai/v1` |
-| StepFun Step Plan | 国内 | `https://api.stepfun.com/step_plan/v1` |
-| StepFun Step Plan | 国际 | `https://api.stepfun.ai/step_plan/v1` |
-| MiniMax | 国内 | `https://api.minimaxi.com/v1` |
-| MiniMax | 国际 | `https://api.minimax.io/v1` |
+| OpenAI | `gpt-image-2` | `https://api.openai.com/v1`（`/images/generations`） |
+| Google | `gemini-3-pro-image` | `https://generativelanguage.googleapis.com/v1beta`（Interactions API `/interactions`） |
 
-官方文档：[StepFun 国内](https://platform.stepfun.com/docs/zh/api-reference/images/image) · [StepFun 国际](https://platform.stepfun.ai/docs/en/api-reference/images/image) · [StepFun Step Plan](https://platform.stepfun.com/docs/zh/step-plan/integrations/image-api) · [MiniMax 国内](https://platform.minimaxi.com/docs/api-reference/image-generation-i2i)
+官方文档：[OpenAI 图片生成](https://developers.openai.com/api/docs/guides/image-generation) · [Gemini 图片生成](https://ai.google.dev/gemini-api/docs/image-generation)
 
 ---
 
@@ -234,7 +231,7 @@ pdftoppm -jpeg -r 100 deck.pdf slide
 | **适合** | 线下分享、demo day、个人风格演讲 | 需交付 .pptx、后续可编辑、中文排版稳定的 deck |
 | **审美系统** | 两套固定模板（杂志风、瑞士风） | 两套锁定 recipe + 可扩展主题系统 |
 | **QA 方式** | HTML 版式校验器（`data-layout`） | PPTX 渲染 + 启发式 QA、CJK 溢出、可编辑性、色彩对比 |
-| **配图** | Codex/GPT-Image 入 HTML | provider 层（StepFun/MiniMax）返回 PPTX layout 元数据 |
+| **配图** | Codex/GPT-Image 入 HTML | provider 层（GPT Image 2 / Nano Banana Pro）返回 PPTX layout 元数据 |
 
 **两条路线，互补。** 浏览器演讲选 HTML；交付物必须是 `.pptx` 选本仓库。
 
