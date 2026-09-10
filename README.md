@@ -99,7 +99,7 @@ Make this README into an editable Chinese PPTX, ~8 slides, editorial-grid recipe
 npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 ```
 
-> The install is self-contained — `SKILL.md`, `lib/`, `recipes/`, `references/` **and the render-QA gate (`scripts/`)** travel together, so `/skill:themed-cn-pptx` in pi (or the equivalent in Claude Code / Codex) can run `render-qa`, `cjk-overflow-check`, `color-qa` and `pptx-editable-check` straight out of `~/.agents/skills/themed-cn-pptx/` with no clone of this repo. Only `pptxgenjs` (deck *generation*) still needs `npm i` in your own deck project.
+> The install is self-contained — `SKILL.md`, `lib/`, `recipes/`, `references/` **and the render-QA gate (`scripts/`)** travel together, so `/skill:themed-cn-pptx` in pi (or the equivalent in Claude Code / Codex) can run `render-qa`, `cjk-overflow-check`, `color-qa` and `pptx-editable-check` straight out of `~/.agents/skills/themed-cn-pptx/` with no clone of this repo. Only `pptxgenjs` (deck *generation*) still needs `npm i` in your own deck project. The standard Anthropic `pptx` skill is an **optional** pairing, not a dependency — its license forbids redistribution, so it is deliberately not vendored in this repo; fetch it from the official channel if you want it alongside.
 
 ---
 

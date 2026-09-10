@@ -99,7 +99,7 @@ npm run demos   # 一次构建全部三套 demo（无需 key）
 npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 ```
 
-> 安装后即为自包含：`SKILL.md`、`lib/`、`recipes/`、`references/` **以及渲染 QA 门禁（`scripts/`）**一起随技能安装，所以在 `~/.agents/skills/themed-cn-pptx/`（或 `~/.pi/agent/skills/`、`.claude/skills/`）里直接用 `/skill:themed-cn-pptx` 就能跑 `render-qa`、`cjk-overflow-check`、`color-qa`、`pptx-editable-check`，不需要 clone 本仓库。只有生成 deck 需要的 `pptxgenjs` 仍要在你自己的工程里 `npm i`。
+> 安装后即为自包含：`SKILL.md`、`lib/`、`recipes/`、`references/` **以及渲染 QA 门禁（`scripts/`）**一起随技能安装，所以在 `~/.agents/skills/themed-cn-pptx/`（或 `~/.pi/agent/skills/`、`.claude/skills/`）里直接用 `/skill:themed-cn-pptx` 就能跑 `render-qa`、`cjk-overflow-check`、`color-qa`、`pptx-editable-check`，不需要 clone 本仓库。只有生成 deck 需要的 `pptxgenjs` 仍要在你自己的工程里 `npm i`。标准 `pptx` skill（Anthropic 出品）只是**可选搭配**而非依赖——它的许可禁止再分发，所以本仓库刻意不代为打包，需要请自行从官方渠道获取。
 
 ---
 

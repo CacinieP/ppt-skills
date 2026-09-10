@@ -17,7 +17,7 @@ description: >-
 
 **适用**：用 PptxGenJS 构建或修改中文 + IP/角色主题 + 嵌入二维码 的可编辑 PPTX 演示文稿
 
-**依赖技能**：标准 `pptx` skill（本 skill 是它的增量补充）
+**可选搭配**：标准 `pptx` skill（Anthropic 出品，本 skill 早期是它的增量补充）。它**不是依赖**：本 skill 自带 `scripts/` QA 门禁与 `lib/` 工具，没有它也能自成闭环；Anthropic 版 `pptx` 的许可禁止再分发，因此不随本仓库一起安装，需要请自行从官方渠道获取。
 
 **生图能力**：集成 OpenAI GPT Image 2 和 Google Nano Banana Pro（Gemini 3 Pro Image）文生图 API，API Key 从环境变量读取，不硬编码
 
