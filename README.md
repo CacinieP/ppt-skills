@@ -99,6 +99,8 @@ Make this README into an editable Chinese PPTX, ~8 slides, editorial-grid recipe
 npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 ```
 
+> The install is self-contained — `SKILL.md`, `lib/`, `recipes/`, `references/` **and the render-QA gate (`scripts/`)** travel together, so `/skill:themed-cn-pptx` in pi (or the equivalent in Claude Code / Codex) can run `render-qa`, `cjk-overflow-check`, `color-qa` and `pptx-editable-check` straight out of `~/.agents/skills/themed-cn-pptx/` with no clone of this repo. Only `pptxgenjs` (deck *generation*) still needs `npm i` in your own deck project.
+
 ---
 
 ## 📋 Commands
@@ -257,21 +259,21 @@ Watch for: CJK overflow, cropped full-width punctuation, unreadable text on imag
 ```text
 ppt-skills/
   README.md            README.zh-CN.md      docs/                 # rendered demo images (committed)
-  package.json         design-principles.md
+  package.json
   .github/workflows/ci.yml
   examples/
     build_miku_demo.mjs  build_editorial_demo.mjs  build_darklaunch_demo.mjs
     color-qa.sample.json  color-qa.presets.json  cjk-overflow.sample.json  render-qa.sample.json
     slides/output/        # the committed .pptx demos — open & edit in PowerPoint
       miku-demo.pptx  editorial-demo.pptx  darklaunch-demo.pptx
-  scripts/
-    smoke-test.mjs  color-qa.mjs  color-qa-presets.mjs
-    render-qa.mjs   cjk-overflow-check.mjs   pptx-editable-check.py
-  skills/themed-cn-pptx/
+  scripts/            # repo dev/CI tooling only (not part of the installed skill)
+    validate-skills.mjs  smoke-test.mjs  color-qa-presets.mjs
+  skills/themed-cn-pptx/          # ← everything here is what `npx skills add` installs
     SKILL.md
-    references/   aesthetic-rules.md  image-constraints.md  layout-slots.md
-    recipes/      recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
-    lib/          ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
+    scripts/    render-qa.mjs  cjk-overflow-check.mjs  color-qa.mjs  pptx-editable-check.py
+    references/ aesthetic-rules.md  image-constraints.md  layout-slots.md  design-principles.md
+    recipes/    recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
+    lib/        ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
 ```
 
 ---

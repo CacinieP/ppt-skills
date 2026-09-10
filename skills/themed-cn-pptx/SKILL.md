@@ -40,6 +40,8 @@ description: >-
 
 ## 0. 两条使用路径
 
+> **路径约定**：下文 `$SKILL_DIR` = 本 `SKILL.md` 所在目录（例如 `~/.agents/skills/themed-cn-pptx` 或 `~/.pi/agent/skills/themed-cn-pptx`）。`scripts/`、`lib/`、`references/`、`recipes/` 都以它为根；QA 命令一律写成 `node "$SKILL_DIR/scripts/xxx.mjs" <你的 deck.pptx>`，这样独立安装（没有仓库根目录）也能跑。若你在 `ppt-skills` 仓库 clone 内开发，`npm run qa:render` 等根目录别名等价（见仓库 README §Commands）。
+
 本 skill 按用户意图分为两条路径，先判断再执行：
 
 ### 路径 A：改 PPT
@@ -267,7 +269,7 @@ const C = {
        └── 不知道 ──→ Nord 商务蓝（最安全）
 ```
 
-更多设计理论参考 [`design-principles.md`](../../design-principles.md)。
+更多设计理论参考 [`references/design-principles.md`](references/design-principles.md)。
 
 ---
 
@@ -283,8 +285,8 @@ contrast = (L_lighter + 0.05) / (L_darker + 0.05)
 绿色通道对亮度贡献最大，蓝色最小，所以**不要用 RGB 数值差或“看起来颜色不一样”判断可读性**。正文对比度至少 4.5:1；大标题、粗体大字、UI 边框、图形对象至少 3:1。用 `scripts/color-qa.mjs` 快速检查：
 
 ```bash
-node scripts/color-qa.mjs --fg 0F2233 --bg F1FBFA --role body
-node scripts/color-qa.mjs --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
+node "$SKILL_DIR/scripts/color-qa.mjs" --fg 0F2233 --bg F1FBFA --role body
+node "$SKILL_DIR/scripts/color-qa.mjs" --palette 0F2233,F1FBFA,39C5BB,FF77AA --role body
 ```
 
 ### 色彩方案选择
@@ -669,25 +671,25 @@ slide.addImage({ path: "/data/qr.png", x: 6.95, y: 2.15, w: 2.4, h: 2.4 });
 
 ## 8. 强制 QA 循环
 
-**先跑自动化门禁，再看图。** 三条命令构成 P0 gate，任一不过都不要交付：
+**先跑自动化门禁，再看图。** 三条命令构成 P0 gate，任一不过都不要交付。`<deck.pptx>` 是**当前工程目录**里你刚生成的文件，`$SKILL_DIR` 见 §0：
 
 ```bash
 # 1. PPTX 渲染 + 启发式 QA —— 溢出 / 遮挡 / 越界 / 图文比例 / 缺页码 badge / 版式契约
 #    P0 findings 退出码 1。本机没装 soffice 时静态检查仍会跑。
-npm run qa:render -- output/deck.pptx --fix-hints \
-  --contract references/layout-slots.md
+node "$SKILL_DIR/scripts/render-qa.mjs" output/deck.pptx --fix-hints \
+  --contract "$SKILL_DIR/references/layout-slots.md"
 
 # 2. 可编辑性 / CJK 字体 / 宏 / 主题完整性
-python3 ../../scripts/pptx-editable-check.py output/deck.pptx
+python3 "$SKILL_DIR/scripts/pptx-editable-check.py" output/deck.pptx
 
 # 3. 色板对比度门禁（WCAG AA）
-node ../../scripts/color-qa.mjs --palette <你的色板> --role body
+node "$SKILL_DIR/scripts/color-qa.mjs" --palette <你的色板> --role body
 ```
 
 **生成前**用免渲染估算器预防 CJK 溢出（比渲染一轮再发现快得多）：
 
 ```bash
-node ../../scripts/cjk-overflow-check.mjs --text "你的标题" --font-size 44 --box-width 9
+node "$SKILL_DIR/scripts/cjk-overflow-check.mjs" --text "你的标题" --font-size 44 --box-width 9
 ```
 
 自动化门禁全绿后，再做视觉核对（渲染成图逐页挑刺）：
@@ -769,17 +771,23 @@ pdftoppm -jpeg -r 100 -f N -l N deck.pdf slide-fix
 ## 9. 默认文件布局
 
 ```
-skills/themed-cn-pptx/
+skills/themed-cn-pptx/         # = $SKILL_DIR，独立安装后自包含
   SKILL.md                     # 本文档
   references/
     aesthetic-rules.md         # 视觉系统与美学负面清单
     image-constraints.md       # 生图 manifest、尺寸、负面 prompt
     layout-slots.md            # 可校验的布局槽位契约（render-qa --contract 消费）
+    design-principles.md       # 设计理论基础
   recipes/                     # 锁定审美 recipe：可直接跑的 theme + marks + 布局
     recipe-editorial-grid.mjs  #   中文编辑设计风（克制、发丝线、低饱和）
     recipe-dark-launch.mjs     #   深底发布风（大对比、hero 配图、CTA/QR）
     design-contract.md         #   editorial-grid 锁定项说明
     design-contract-darklaunch.md
+  scripts/                     # QA 门禁（随 skill 一起安装，只依赖 Node/Python 标准库）
+    render-qa.mjs              #   渲染 + 启发式 QA：溢出/遮挡/越界/版式契约
+    cjk-overflow-check.mjs     #   免渲染 CJK 溢出估算（生成前用）
+    color-qa.mjs               #   WCAG 对比度门禁
+    pptx-editable-check.py     #   可编辑性 / CJK 字体 / 宏 / 主题完整性
   lib/
     ai-image.js                # StepFun / MiniMax 通用生图工具库
     stepfun-image.js           # 旧脚本兼容入口，re-export ai-image.js

@@ -66,15 +66,16 @@ emphasis, use weight, size, or the accent — never a new color.
 ## How to QA this recipe
 
 ```bash
+# Run from the ppt-skills clone root (npm aliases qa:render / color:qa / qa:editable are equivalent).
 # 1. Static checks (always)
-node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --fix-hints \
+node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --fix-hints \
   --contract skills/themed-cn-pptx/references/layout-slots.md
 
 # 2. Contrast gate (palette must hold)
-node scripts/color-qa.mjs --palette 2E3440,3B4252,4C566A,ECEFF4,E5E9F0,88C0D0,5E81AC --role body
+node skills/themed-cn-pptx/scripts/color-qa.mjs --palette 2E3440,3B4252,4C566A,ECEFF4,E5E9F0,88C0D0,5E81AC --role body
 
 # 3. Editable contract
-python3 scripts/pptx-editable-check.py examples/slides/output/editorial-demo.pptx
+python3 skills/themed-cn-pptx/scripts/pptx-editable-check.py examples/slides/output/editorial-demo.pptx
 ```
 
 All three must report zero P0. If you changed the palette, `color-qa` must pass

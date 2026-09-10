@@ -30,4 +30,4 @@ const out = resolve(outDir, "darklaunch-demo.pptx");
 await pres.writeFile({ fileName: out });
 
 console.log(`Dark-launch demo PPTX generated: ${out}`);
-console.log("Run QA:  node scripts/render-qa.mjs " + out);
+console.log("Run QA:  node skills/themed-cn-pptx/scripts/render-qa.mjs " + out);

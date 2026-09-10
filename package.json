@@ -1,6 +1,6 @@
 {
   "name": "ppt-skills",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Open-source PPT generation skills with CJK-aware PptxGenJS workflows, AI image helpers (GPT Image 2 / Nano Banana Pro), and a render-QA gate.",
   "type": "module",
   "engines": {
@@ -23,7 +23,7 @@
   ],
   "scripts": {
     "skill:validate": "node scripts/validate-skills.mjs",
-    "color:qa": "node scripts/color-qa.mjs",
+    "color:qa": "node skills/themed-cn-pptx/scripts/color-qa.mjs",
     "color:qa:presets": "node scripts/color-qa-presets.mjs",
     "smoke": "node scripts/smoke-test.mjs",
     "test": "node scripts/validate-skills.mjs && node scripts/smoke-test.mjs && node scripts/color-qa-presets.mjs",
@@ -31,10 +31,10 @@
     "demo:editorial": "node examples/build_editorial_demo.mjs",
     "demo:darklaunch": "node examples/build_darklaunch_demo.mjs",
     "demos": "node examples/build_miku_demo.mjs && node examples/build_editorial_demo.mjs && node examples/build_darklaunch_demo.mjs",
-    "qa:render": "node scripts/render-qa.mjs",
-    "qa:cjk": "node scripts/cjk-overflow-check.mjs",
-    "qa:editable": "python3 scripts/pptx-editable-check.py",
-    "qa:all": "node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx && node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx && node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx"
+    "qa:render": "node skills/themed-cn-pptx/scripts/render-qa.mjs",
+    "qa:cjk": "node skills/themed-cn-pptx/scripts/cjk-overflow-check.mjs",
+    "qa:editable": "python3 skills/themed-cn-pptx/scripts/pptx-editable-check.py",
+    "qa:all": "node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/miku-demo.pptx && node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx && node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx"
   },
   "devDependencies": {
     "pptxgenjs": "^4.0.1",

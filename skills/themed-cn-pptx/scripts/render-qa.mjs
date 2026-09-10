@@ -33,7 +33,8 @@
  *   node scripts/render-qa.mjs deck.pptx
  *   node scripts/render-qa.mjs deck.pptx --json
  *   node scripts/render-qa.mjs deck.pptx --render --out ./qa
- *   node scripts/render-qa.mjs deck.pptx --contract skills/.../references/layout-slots.md
+ *   node scripts/render-qa.mjs deck.pptx --contract references/layout-slots.md
+ *   # (paths are relative to the skill root — the directory holding SKILL.md)
  *
  * Exit code: 1 if any P0 finding. P1/P2 are reported but do not fail.
  */
@@ -41,14 +42,14 @@
 import { readFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { resolve, dirname, basename, join, extname } from "node:path";
-import { readZip, listSlides } from "../skills/themed-cn-pptx/lib/zip-reader.js";
-import { parseSlide, parseRels, slideSizeInches } from "../skills/themed-cn-pptx/lib/pptx-shapes.js";
+import { readZip, listSlides } from "../lib/zip-reader.js";
+import { parseSlide, parseRels, slideSizeInches } from "../lib/pptx-shapes.js";
 import {
   fitsBox,
   countCJK,
   trailingFullWidthPunct,
   FULLWIDTH_PUNCT,
-} from "../skills/themed-cn-pptx/lib/cjk-text.js";
+} from "../lib/cjk-text.js";
 
 const SLIDE_W = 10; // inches, LAYOUT_16x9
 const SLIDE_H = 5.625;

@@ -75,10 +75,11 @@ The pink is **never** used for body text — only kickers and the dual-stripe ta
 ## How to QA this recipe
 
 ```bash
-node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx --fix-hints \
+# Run from the ppt-skills clone root (npm aliases qa:render / color:qa / qa:editable are equivalent).
+node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx --fix-hints \
   --contract skills/themed-cn-pptx/references/layout-slots.md
-node scripts/color-qa.mjs --palette 0B1B2B,06121E,13243A,FFFFFF,E8FFFD,8FA6B4,39C5BB,FF77AA --role body
-python3 scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
+node skills/themed-cn-pptx/scripts/color-qa.mjs --palette 0B1B2B,06121E,13243A,FFFFFF,E8FFFD,8FA6B4,39C5BB,FF77AA --role body
+python3 skills/themed-cn-pptx/scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
 ```
 
 The render-qa `MISSING_PAGE_BADGE` check correctly exempts the closing/QR slide

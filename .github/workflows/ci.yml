@@ -59,17 +59,17 @@ jobs:
       # image aspect, page-badge, layout-slot contract. P0 fails the build.
       - name: render-qa gate on all demo decks
         run: |
-          node scripts/render-qa.mjs examples/slides/output/miku-demo.pptx
-          node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx
-          node scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx
+          node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/miku-demo.pptx
+          node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx
+          node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/darklaunch-demo.pptx
 
       # Editable-text / CJK-font / macro / theme check. python-pptx is
       # installed above, so the deep checks run instead of the zip fallback.
       - name: pptx-editable-check on demo decks
         run: |
-          python3 scripts/pptx-editable-check.py examples/slides/output/miku-demo.pptx
-          python3 scripts/pptx-editable-check.py examples/slides/output/editorial-demo.pptx
-          python3 scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
+          python3 skills/themed-cn-pptx/scripts/pptx-editable-check.py examples/slides/output/miku-demo.pptx
+          python3 skills/themed-cn-pptx/scripts/pptx-editable-check.py examples/slides/output/editorial-demo.pptx
+          python3 skills/themed-cn-pptx/scripts/pptx-editable-check.py examples/slides/output/darklaunch-demo.pptx
 
       - name: Upload demo PPTX artifacts
         uses: actions/upload-artifact@v6
@@ -102,6 +102,16 @@ jobs:
           npx --yes skills@1.5.23 add "$GITHUB_WORKSPACE" --skill themed-cn-pptx --agent codex --copy -y
           test -f .agents/skills/themed-cn-pptx/SKILL.md
 
+          # The render-QA gate must travel with the skill. A standalone install has
+          # no repo root to fall back on for scripts/ or lib/, so assert the tools
+          # landed inside the skill and then run them from the install copy itself.
+          test -f .agents/skills/themed-cn-pptx/scripts/render-qa.mjs
+          test -f .agents/skills/themed-cn-pptx/lib/cjk-text.js
+          test -f .agents/skills/themed-cn-pptx/scripts/pptx-editable-check.py
+          node .agents/skills/themed-cn-pptx/scripts/render-qa.mjs \
+            "$GITHUB_WORKSPACE/examples/slides/output/miku-demo.pptx" \
+            --contract .agents/skills/themed-cn-pptx/references/layout-slots.md
+
   # Heavy render verification runs once (Node 22 only), after the fast gates
   # pass. Installing LibreOffice + poppler on a single node keeps the run fast.
   render:
@@ -129,7 +139,7 @@ jobs:
       # QA runs against the rasterized slides. Produces per-slide images for
       # human review as artifacts.
       - name: render-qa with PDF/JPG render (editorial demo)
-        run: node scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --render --out qa-editorial
+        run: node skills/themed-cn-pptx/scripts/render-qa.mjs examples/slides/output/editorial-demo.pptx --render --out qa-editorial
 
       - name: Upload rendered slide JPGs
         uses: actions/upload-artifact@v6

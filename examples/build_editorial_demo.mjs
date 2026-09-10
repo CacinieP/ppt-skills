@@ -30,4 +30,4 @@ const out = resolve(outDir, "editorial-demo.pptx");
 await pres.writeFile({ fileName: out });
 
 console.log(`Editorial demo PPTX generated: ${out}`);
-console.log("Run QA:  node scripts/render-qa.mjs " + out);
+console.log("Run QA:  node skills/themed-cn-pptx/scripts/render-qa.mjs " + out);

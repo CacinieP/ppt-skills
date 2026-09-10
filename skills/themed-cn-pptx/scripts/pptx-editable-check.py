@@ -40,6 +40,14 @@ import sys
 import zipfile
 from pathlib import Path
 
+# Report lines contain ✅ / CJK; a legacy Windows console code page (GBK/cp936)
+# would raise UnicodeEncodeError before the verdict is printed.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):  # pragma: no cover - non-standard streams
+        pass
+
 # CJK Unified Ideographs + extensions + full-width punctuation ranges.
 CJK_RE = re.compile(
     r"[\u3000-\u303f\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff"

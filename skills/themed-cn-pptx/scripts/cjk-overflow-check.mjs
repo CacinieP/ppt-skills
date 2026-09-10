@@ -18,7 +18,9 @@
  *     --text "训练场：从零到一的智能体" --font-size 44 --box-width 9
  *
  *   # Batch from JSON (build scripts can emit this)
- *   node scripts/cjk-overflow-check.mjs --json examples/cjk-overflow.sample.json
+ *   # Paths above/below are relative to the skill root (the directory holding SKILL.md);
+ *   # the repo sample manifest is two levels up.
+ *   node scripts/cjk-overflow-check.mjs --json ../../examples/cjk-overflow.sample.json
  *
  *   # Read a JSON manifest of text boxes and recommend font sizes
  *   node scripts/cjk-overflow-check.mjs --json manifest.json --recommend
@@ -35,7 +37,7 @@ import {
   countCJK,
   trailingFullWidthPunct,
   FULLWIDTH_PUNCT,
-} from "../skills/themed-cn-pptx/lib/cjk-text.js";
+} from "../lib/cjk-text.js";
 
 function toCamel(key) {
   // accept both --font-size and --fontSize

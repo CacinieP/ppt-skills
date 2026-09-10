@@ -99,6 +99,8 @@ npm run demos   # 一次构建全部三套 demo（无需 key）
 npx skills add https://github.com/CacinieP/ppt-skills --skill themed-cn-pptx
 ```
 
+> 安装后即为自包含：`SKILL.md`、`lib/`、`recipes/`、`references/` **以及渲染 QA 门禁（`scripts/`）**一起随技能安装，所以在 `~/.agents/skills/themed-cn-pptx/`（或 `~/.pi/agent/skills/`、`.claude/skills/`）里直接用 `/skill:themed-cn-pptx` 就能跑 `render-qa`、`cjk-overflow-check`、`color-qa`、`pptx-editable-check`，不需要 clone 本仓库。只有生成 deck 需要的 `pptxgenjs` 仍要在你自己的工程里 `npm i`。
+
 ---
 
 ## 📋 命令
@@ -253,21 +255,21 @@ pdftoppm -jpeg -r 100 deck.pdf slide
 ```text
 ppt-skills/
   README.md            README.zh-CN.md      docs/                 # 渲染好的 demo 图片（已提交）
-  package.json         design-principles.md
+  package.json
   .github/workflows/ci.yml
   examples/
     build_miku_demo.mjs  build_editorial_demo.mjs  build_darklaunch_demo.mjs
     color-qa.sample.json  color-qa.presets.json  cjk-overflow.sample.json  render-qa.sample.json
     slides/output/        # 已提交的 .pptx demo —— 用 PowerPoint 打开编辑
       miku-demo.pptx  editorial-demo.pptx  darklaunch-demo.pptx
-  scripts/
-    smoke-test.mjs  color-qa.mjs  color-qa-presets.mjs
-    render-qa.mjs   cjk-overflow-check.mjs   pptx-editable-check.py
-  skills/themed-cn-pptx/
+  scripts/            # 仅仓库开发/CI 工具（不会随技能安装）
+    validate-skills.mjs  smoke-test.mjs  color-qa-presets.mjs
+  skills/themed-cn-pptx/          # ← 这个目录里的东西就是 npx skills add 安装的全部内容
     SKILL.md
-    references/   aesthetic-rules.md  image-constraints.md  layout-slots.md
-    recipes/      recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
-    lib/          ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
+    scripts/    render-qa.mjs  cjk-overflow-check.mjs  color-qa.mjs  pptx-editable-check.py
+    references/ aesthetic-rules.md  image-constraints.md  layout-slots.md  design-principles.md
+    recipes/    recipe-editorial-grid.mjs  recipe-dark-launch.mjs  design-contract*.md
+    lib/        ai-image.js  stepfun-image.js  cjk-text.js  pptx-shapes.js  zip-reader.js
 ```
 
 ---

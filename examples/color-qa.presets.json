@@ -1,5 +1,5 @@
 {
-  "description": "All preset palette contrast pairs. Generated ratios are verified by scripts/color-qa.mjs. Do NOT hand-edit ratio annotations — run: node scripts/color-qa.mjs --json examples/color-qa.presets.json",
+  "description": "All preset palette contrast pairs. Generated ratios are verified by skills/themed-cn-pptx/scripts/color-qa.mjs. Do NOT hand-edit ratio annotations — run: node skills/themed-cn-pptx/scripts/color-qa.mjs --json examples/color-qa.presets.json",
   "presets": [
     {
       "name": "Miku",
